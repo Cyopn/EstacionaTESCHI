@@ -2,40 +2,76 @@
 <!DOCTYPE html>
 <html lang="es">
   <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <title>Inicio - EstacionaTESCHI</title>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <title>Tablero - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
-    <div>
-      <img src="{% static 'images/bg-index.png' %}" alt="bg" border="0" class="absolute h-full w-full" />
-      <div class="absolute inset-0 bg-black opacity-30"></div>
-      <div class="absolute z-2 w-full h-[65vh] bg-black opacity-45 text-white items-center justify-center flex">
-        <div class="h-full w-15/20"></div>
-        <div class="h-full w-5/20 bg-white rounded-tl-[13vh]"></div>
-      </div>
-      <div class="relative z-2 w-full h-[65vh] text-white items-center justify-center flex">
-        <div class="h-full w-4/5 flex flex-col justify-center">
-          <div class="">
-            <h1 class="text-6xl pb-5">EstacionaTESCHI</h1>
-            <p class="text-3xl">Sistema de gestion de acceso vehicular</p>
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <aside class="w-[12%] bg-[#0064FA] h-screen float-left rounded-tr-lg px-4 pt-4">
+      <ul>
+        <li class="mb-1 w-full h-12">
+          <a href="/login/" class="block w-full h-full hover:shadow-lg rounded flex items-center px-2 cursor-pointer">
+            <span class="text-2xl flex items-center h-full"><span class="fi fi-sr-user-pen"></span></span>
+            <label class="block w-full h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Empleados</label>
+          </a>
+        </li>
+        <li class="mb-1 w-full h-10">
+          <a href="/login/" class="block w-full h-full hover:shadow-lg rounded flex items-center px-2 cursor-pointer">
+            <span class="text-2xl flex items-center h-full"><span class="fi fi-bs-car"></span></span>
+            <label class="block w-full h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Acceso</label>
+          </a>
+        </li>
+        <li class="mb-1 w-full h-10">
+          <a href="/login/" class="block w-full h-full hover:shadow-lg rounded flex items-center px-2 cursor-pointer">
+            <span class="text-2xl flex items-center h-full"><span class="fi fi-bs-car-garage"></span></span>
+            <label class="block w-full h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Asignacion</label>
+          </a>
+        </li>
+        <li class="mb-1 w-full h-10">
+          <a href="/login/" class="block w-full h-full hover:shadow-lg rounded flex items-center px-2 cursor-pointer">
+            <span class="text-2xl flex items-center h-full"><span class="fi fi-sr-user"></span></span>
+            <label class="block w-full h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Usuarios</label>
+          </a>
+        </li>
+        <li class="mb-1 w-full h-10">
+          <a href="/login/" class="block w-full h-full hover:shadow-lg rounded flex items-center px-2 cursor-pointer">
+            <span class="text-2xl flex items-center h-full"><span class="fi fi-sc-auction"></span></span>
+            <label class="block w-full h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Sanciones</label>
+          </a>
+        </li>
+      </ul>
+    </aside>
+    <main class="p-8 flex justify-center items-center w-[88%] h-[88%] float-right">
+      <div class="w-[90%] h-[90%] ring-2 rounded-t-xl overflow-hidden">
+        <div class="text-4xl font-bold mb-4 text-center bg-[#E6E6E6] inset-shadow-sm inset-shadow-gray-400 py-4 flex w-full">
+          <div class="w-1/2 text-left pl-8">Area</div>
+          <div class="w-1/2 text-left pl-8">Espacios</div>
+        </div>
+        <div class="flex h-[85%]">
+          <div class="w-full h-full">
+            {% for area in areas %}
+              <div class="text-2xl font-bold text-center flex w-full">
+                <div class="w-1/2 text-left pl-8 py-2 flex items-center">
+                  <span class="inline-block mr-4 align-middle" style="width:10px; height:100%; display:inline-block; background-color: {{ area.color }}; border-radius:3px;"></span>
+                  {{ area.nombre }}
+                </div>
+                <div class="w-1/2 text-left pl-8 py-2">{{ area.capacidad_disponible }} - {{ area.capacidad_total }}</div>
+              </div>
+            {% endfor %}
           </div>
         </div>
       </div>
-      <img src="{% static 'images/bg-auto.png' %}" alt="logo" border="0" class="absolute bottom-[30vh] start-[70vw] z-3" />
-      <div class="absolute z-2 t-[65vh] w-full h-[20vh]">
-        <div class="absolute h-full w-full z-3 bg-white opacity-45 rounded-b-[13vh]"></div>
-
-        <div class="absolute h-full w-full z-4 flex items-center justify-center flex">
-          <div class="w-1/2 flex justify-center">
-            <a href="/login/" class="bg-[#006331] text-white font-bold py-5 px-15 rounded-full text-2xl cursor-pointer inline-flex items-center justify-center">Iniciar sesion</a>
-          </div>
-          <div class="w-1/2 flex justify-center">
-            <a href="/register/" class="bg-[#000000] text-white font-bold py-5 px-15 rounded-full text-2xl cursor-pointer">Registrate aqui</a>
-          </div>
-        </div>
-      </div>
-    </div>
+    </main>
   </body>
 </html>
