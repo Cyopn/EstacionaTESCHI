@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <title>Registro - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <div>
+      <div class="absolute w-full h-full flex">
+        <div class="w-18/25 h-full"></div>
+        <div class="absolute h-full w-7/25 bg-[#0064FA] rounded-tl-[13vh] end-0 top-0"></div>
+        <div class="absolute h-[76vh] w-7/25 bg-[#053172] rounded-tl-[13vh] end-0 bottom-0 z-2"></div>
+        <img src="{% static 'images/bg-auto.png' %}" alt="logo" border="0" class="w-[37vw] absolute bottom-0 start-[65vw] z-3" />
+      </div>
+      <div class="flex flex-row justify-start ml-20 items-center content-center absolute top-0 z-[3] w-full h-full">
+        <div class="flex flex-col bg-white w-[30%] rounded-4xl text-black inset-shadow-sm inset-shadow-gray-500 shadow-xl/20">
+          <h1 class="text-4xl pt-10 pb-5 text-center font-bold">Registrate</h1>
+          <span class="fi fi-sr-user text-8xl py-2 text-center w-full"></span>
+          <form class="flex flex-col items-center justify-center w-full text-black">
+            <div class="relative w-[75%] py-5">
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
+                <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-user"></span></span>
+              </div>
+              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Nombre" required />
+            </div>
+            <div class="relative w-[45%] py-5">
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
+                <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-at"></span></span>
+              </div>
+              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Correo" type="email" required />
+            </div>
+            <div class="relative w-[45%] py-5">
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
+                <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-lock"></span></span>
+              </div>
+              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Contraseña" type="password" required />
+            </div>
+            <div class="relative w-[45%] py-5">
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
+                <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-lock"></span></span>
+              </div>
+              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Confirmar contraseña" type="password" required />
+            </div>
+            <div class="pt-5 pb-10">
+              <button type="submit" class="text-black text-xl px-5 p-3 rounded-xl bg-gradient-to-r from-[#FFE417] to-[#FDBD4A] cursor-pointer disabled:opacity-50">Registrarse</button>
+            </div>
+          </form>
+        </div>
+        <div class="w-10 h-full"></div>
+      </div>
+    </div>
+  </body>
+</html>
