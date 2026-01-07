@@ -17,45 +17,78 @@
         <img src="{% static 'images/bg-auto.png' %}" alt="logo" border="0" class="w-[37vw] absolute bottom-0 start-[65vw] z-3" />
       </div>
       <div class="flex flex-row justify-start ml-20 items-center content-center absolute top-0 z-[3] w-full h-full">
-        <div class="flex flex-col bg-white w-[30%] rounded-4xl text-black inset-shadow-sm inset-shadow-gray-500 shadow-xl/20">
+        <div class="flex flex-col bg-white w-[40%] rounded-4xl text-black inset-shadow-sm inset-shadow-gray-500 shadow-xl/20">
           <h1 class="text-4xl pt-10 pb-5 text-center font-bold">Registrate</h1>
           <span class="fi fi-sr-user text-8xl py-2 text-center w-full"></span>
-          <form class="flex flex-col items-center justify-center w-full text-black">
+          <form method="post" class="flex flex-col items-center justify-center w-full text-black">
+            {% csrf_token %}
+            {% if messages %}
+              <div id="toast" class="fixed top-5 end-5 z-50">
+                <div class="bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-start space-x-3 max-w-sm">
+                  <div class="flex-1">
+                    <ul class="list-disc list-inside text-sm">
+                      {% for message in messages %}
+                        <li>{{ message }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <button id="toast-close" class="text-white opacity-90 hover:opacity-100 cursor-pointer">✕</button>
+                </div>
+              </div>
+              <script>
+                ;(function () {
+                  const t = document.getElementById('toast')
+                  if (!t) return
+                  const close = document.getElementById('toast-close')
+                  function hide() {
+                    t.style.display = 'none'
+                  }
+                  setTimeout(hide, 5000)
+                  if (close) close.addEventListener('click', hide)
+                })()
+              </script>
+            {% endif %}
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-user"></span></span>
               </div>
-              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Nombre" required />
+              <input name="nombre" value="{{ nombre|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Nombre" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-user"></span></span>
               </div>
-              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Apellidos" required />
+              <input name="apellidos" value="{{ apellidos|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Apellidos" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-at"></span></span>
               </div>
-              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Correo" type="email" required />
+              <input name="correo" value="{{ correo|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Correo" type="email" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-phone-flip"></span></span>
               </div>
-              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Numero de telefono" required />
+              <input name="telefono" value="{{ telefono|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Numero de telefono" required />
+            </div>
+            <div class="relative w-[65%] py-4">
+              <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
+                <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-phone-flip"></span></span>
+              </div>
+              <input name="numero_empleado" value="{{ numero_empleado|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Numero de empleado" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-lock"></span></span>
               </div>
-              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Contraseña" type="password" required />
+              <input name="contrasena" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Contraseña" type="password" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-lock"></span></span>
               </div>
-              <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Confirmar contraseña" type="password" required />
+              <input name="confirmar" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Confirmar contraseña" type="password" required />
             </div>
             <div class="pt-5 pb-10">
               <button type="submit" class="text-black text-xl px-5 p-3 rounded-xl bg-gradient-to-r from-[#FFE417] to-[#FDBD4A] cursor-pointer disabled:opacity-50">Registrarse</button>

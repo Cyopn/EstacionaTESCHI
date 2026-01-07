@@ -13,7 +13,34 @@
       <img src="{% static 'images/bg-login.png' %}" alt="bg" border="0" class="absolute h-full w-full" />
       <div class="absolute flex z-3 w-full h-full">
         <div class="absolute flex flex-col justify-evenly bg-white h-full w-[30%] end-0 rounded-tl-[8vh] text-black">
-          <form class="flex flex-col justify-evenly items-center justify-center w-full h-full text-black">
+          <form method="post" class="flex flex-col justify-evenly items-center justify-center w-full h-full text-black">
+            {% csrf_token %}
+            {% if messages %}
+              <div id="toast" class="fixed top-5 end-5 z-50">
+                <div class="bg-red-600 text-white px-4 py-3 rounded-lg shadow-lg flex items-start space-x-3 max-w-sm">
+                  <div class="flex-1">
+                    <ul class="list-disc list-inside text-sm">
+                      {% for message in messages %}
+                        <li>{{ message }}</li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+                  <button id="toast-close" class="text-white opacity-90 hover:opacity-100">✕</button>
+                </div>
+              </div>
+              <script>
+                ;(function () {
+                  const t = document.getElementById('toast')
+                  if (!t) return
+                  const close = document.getElementById('toast-close')
+                  function hide() {
+                    t.style.display = 'none'
+                  }
+                  setTimeout(hide, 5000)
+                  if (close) close.addEventListener('click', hide)
+                })()
+              </script>
+            {% endif %}
             <h1 class="text-5xl pt-10 pb-5 w-full text-center font-bold">Bienvenido</h1>
             <span class="fi fi-sr-user text-9xl py-2 w-full text-center"></span>
             <div class="w-full flex flex-col items-center">
@@ -21,13 +48,13 @@
                 <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                   <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-at"></span></span>
                 </div>
-                <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-lg bg-gray-200/80 text-center" placeholder="Correo" type="email" required />
+                <input name="correo" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-lg bg-gray-200/80 text-center" placeholder="Correo" type="email" required />
               </div>
               <div class="relative w-[70%] py-5">
                 <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                   <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-lock"></span></span>
                 </div>
-                <input class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-lg bg-gray-200/80 text-center" placeholder="Contraseña" type="password" required />
+                <input name="contrasena" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-lg bg-gray-200/80 text-center" placeholder="Contraseña" type="password" required />
               </div>
             </div>
             <div class="py-2">
