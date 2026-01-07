@@ -1,0 +1,220 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <title>Empleados - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <main class="w-full h-[88%]">
+      <img src="{% static 'images/bg-employee.png' %}" alt="bg" border="0" class="absolute z-0 h-[25%] w-full top-[12%] object-cover" />
+      <h1 class="relative text-4xl font-bold text-center bg-black w-full h-[10%] py-4 text-white">Administracion de Empleados</h1>
+      <div class="absolute w-[80%] h-[68%] top-[28%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+        <h1 class="text-2xl m-4 text-center">Gestion de empleados</h1>
+        <div class="w-full flex items-center justify-end">
+          <div class="w-[30%]">
+            <div class="mr-10 relative end-0">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+        </div>
+        <table class="w-[90%] table-auto border-collapse border border-none m-10">
+          <thead>
+            <tr class="text-lg">
+              <th class="border border-none px-4 py-2 text-center">N. empleado</th>
+              <th class="border border-none px-4 py-2 text-center">Nombre</th>
+              <th class="border border-none px-4 py-2 text-center">Apellido</th>
+              <th class="border border-none px-4 py-2 text-center">Correo</th>
+              <th class="border border-none px-4 py-2 text-center">Rol</th>
+              <th class="border border-none px-4 py-2 text-center">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if employees %}
+              {% for employee in employees %}
+                <tr class="hover:bg-gray-100 border-b border-black" data-numero-empleado="{{ employee.numero_empleado|escape }}" data-nombre="{{ employee.nombre|escape }}" data-apellidos="{{ employee.apellidos|escape }}" data-correo="{{ employee.correo|escape }}" data-contrasena="{{ employee.contrasena|escape }}" data-telefono="{{ employee.telefono|default_if_none:''|escape }}" data-rol="{{ employee.rol|escape }}" data-puesto="{{ employee.puesto|escape }}">
+                  <td class="border border-none px-4 py-2 text-center">{{ employee.numero_empleado }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ employee.nombre }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ employee.apellidos }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ employee.correo }}</td>
+                  <td class="border border-none px-4 py-2 text-center">
+                    {% if employee.rol == 'JEFE_AREA' %}
+                      <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#04DF34;">{{ employee.get_rol_display }}</span>
+                    {% elif employee.rol == 'GUARDIA' %}
+                      <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#FFE417;">{{ employee.get_rol_display }}</span>
+                    {% elif employee.rol == 'PATRULLA' %}
+                      <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#8392EE;">{{ employee.get_rol_display }}</span>
+                    {% else %}
+                      {{ employee.get_rol_display }}
+                    {% endif %}
+                  </td>
+                  <td class="border border-none px-4 py-2 text-center">
+                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td class="px-4 py-2" colspan="6">No hay empleados registrados.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <div id="employee-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Editar Empleado</h2>
+        <form id="employee-form" method="post" action="{% url 'employee' %}">
+          {% csrf_token %}
+          <input type="hidden" name="numero_empleado" id="modal-numero_empleado" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Nombre</label>
+              <input id="modal-nombre" name="nombre" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Apellidos</label>
+              <input id="modal-apellidos" name="apellidos" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Correo</label>
+              <input id="modal-correo" name="correo" type="email" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Contraseña</label>
+              <input id="modal-contrasena" name="contraseña" type="password" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Teléfono</label>
+              <input id="modal-telefono" name="telefono" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Puesto</label>
+              <select id="modal-puesto" name="puesto" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="EDIFICIO">Edificio</option>
+                <option value="ENTRADA_PEATONAL">Entrada peatonal</option>
+                <option value="ENTRADA_VEHICULAR">Entrada vehicular</option>
+                <option value="CAFETERIA">Cafetería</option>
+                <option value="ESTACIONAMIENTO">Estacionamiento</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Rol</label>
+              <select id="modal-rol" name="rol" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="JEFE_AREA">Jefe de área</option>
+                <option value="GUARDIA">Guardia</option>
+                <option value="PATRULLA">Patrulla</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        const modal = document.getElementById('employee-modal')
+        const closeBtn = document.getElementById('modal-close')
+        const cancelBtn = document.getElementById('modal-cancel')
+      
+        function openModal() {
+          modal.classList.remove('hidden')
+          modal.classList.add('flex')
+        }
+      
+        function closeModal() {
+          modal.classList.add('hidden')
+          modal.classList.remove('flex')
+        }
+      
+        function fillModalFromRow(row) {
+          document.getElementById('modal-numero_empleado').value = row.dataset.numeroEmpleado || row.dataset.numeroEmpleado || row.dataset.numero_empleado || ''
+          document.getElementById('modal-nombre').value = row.dataset.nombre || ''
+          document.getElementById('modal-apellidos').value = row.dataset.apellidos || ''
+          document.getElementById('modal-correo').value = row.dataset.correo || ''
+          document.getElementById('modal-contrasena').value = ''
+          document.getElementById('modal-telefono').value = row.dataset.telefono || ''
+          if (document.getElementById('modal-rol')) document.getElementById('modal-rol').value = row.dataset.rol || ''
+          if (document.getElementById('modal-puesto')) document.getElementById('modal-puesto').value = row.dataset.puesto || ''
+        }
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            const row = e.target.closest('tr')
+            if (!row) return
+            fillModalFromRow(row)
+            openModal()
+          })
+        })
+        closeBtn && closeBtn.addEventListener('click', closeModal)
+        cancelBtn && cancelBtn.addEventListener('click', closeModal)
+        modal &&
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal()
+          })
+        const searchInput = document.getElementById('search-input')
+        const searchBtn = document.getElementById('search-btn')
+        const tbody = document.querySelector('table tbody')
+        let noResultsRowId = 'no-results-row'
+      
+        function clearNoResults() {
+          const ex = document.getElementById(noResultsRowId)
+          if (ex) ex.remove()
+        }
+        function filterTable(term) {
+          term = (term || '').toLowerCase().trim()
+          clearNoResults()
+          const rows = Array.from(tbody.querySelectorAll('tr'))
+          let visible = 0
+          rows.forEach((row) => {
+            const fields = [row.dataset.numeroEmpleado || '', row.dataset.nombre || '', row.dataset.apellidos || '', row.dataset.correo || '', row.dataset.telefono || '', row.dataset.rol || '', row.dataset.puesto || '']
+            const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
+            if (matches) {
+              row.style.display = ''
+              visible++
+            } else {
+              row.style.display = 'none'
+            }
+          })
+          if (visible === 0) {
+            const tr = document.createElement('tr')
+            tr.id = noResultsRowId
+            tr.innerHTML = `<td class="px-4 py-2 text-center" colspan="6">No se encontraron resultados.</td>`
+            tbody.appendChild(tr)
+          }
+        }
+        function debounce(fn, wait) {
+          let t
+          return function (...args) {
+            clearTimeout(t)
+            t = setTimeout(() => fn.apply(this, args), wait)
+          }
+        }
+        const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
+        searchInput && searchInput.addEventListener('input', debouncedFilter)
+        searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      })()
+    </script>
+  </body>
+</html>
