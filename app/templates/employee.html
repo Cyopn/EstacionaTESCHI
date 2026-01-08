@@ -13,6 +13,29 @@
     <title>Empleados - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'success' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-green-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% elif 'error' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-red-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% else %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-gray-700 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
     <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
       <a class="start-0 flex items-center" href="/index/">
         <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
@@ -214,6 +237,20 @@
         const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
         searchInput && searchInput.addEventListener('input', debouncedFilter)
         searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      
+        // Toast auto-hide and close handling
+        const toasts = document.querySelectorAll('#toast-container .toast')
+        toasts.forEach((t) => {
+          const close = t.querySelector('.toast-close')
+          const hide = () => t.remove()
+          // auto hide after 4s
+          const timer = setTimeout(hide, 4000)
+          close &&
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              hide()
+            })
+        })
       })()
     </script>
   </body>
