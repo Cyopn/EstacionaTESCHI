@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
 from django.views import View
 
 from app.models import Empleado
@@ -15,15 +16,20 @@ class EmployeeView(View):
             return redirect(request.path)
 
         empleado = get_object_or_404(Empleado, numero_empleado=numero)
-        empleado.nombre = request.POST.get('nombre', empleado.nombre)
-        empleado.apellidos = request.POST.get('apellidos', empleado.apellidos)
-        empleado.correo = request.POST.get('correo', empleado.correo)
-        contrasena = request.POST.get('contraseña')
-        if contrasena:
-            empleado.contraseña = contrasena
-        empleado.telefono = request.POST.get('telefono', empleado.telefono)
-        empleado.rol = request.POST.get('rol', empleado.rol)
-        empleado.puesto = request.POST.get('puesto', empleado.puesto)
-        empleado.save()
+        try:
+            empleado.nombre = request.POST.get('nombre', empleado.nombre)
+            empleado.apellidos = request.POST.get(
+                'apellidos', empleado.apellidos)
+            empleado.correo = request.POST.get('correo', empleado.correo)
+            contrasena = request.POST.get('contraseña')
+            if contrasena:
+                empleado.contraseña = contrasena
+            empleado.telefono = request.POST.get('telefono', empleado.telefono)
+            empleado.rol = request.POST.get('rol', empleado.rol)
+            empleado.puesto = request.POST.get('puesto', empleado.puesto)
+            empleado.save()
+            messages.success(request, 'Empleado actualizado correctamente.')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar empleado: {str(e)}')
 
         return redirect(request.path)

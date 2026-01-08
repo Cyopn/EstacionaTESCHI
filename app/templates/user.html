@@ -1,0 +1,228 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <title>Usuarios - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'success' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-green-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% elif 'error' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-red-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% else %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-gray-700 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <main class="w-full h-[88%]">
+      <img src="{% static 'images/bg-employee.png' %}" alt="bg" border="0" class="absolute z-0 h-[25%] w-full top-[12%] object-cover" />
+      <h1 class="relative text-4xl font-bold text-center bg-black w-full h-[10%] py-4 text-white">Administracion de Usuarios</h1>
+      <div class="absolute w-[80%] h-[68%] top-[28%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+        <h1 class="text-2xl m-4 text-center">Gestion de usuarios</h1>
+        <div class="w-full flex items-center justify-end">
+          <div class="w-[30%]">
+            <div class="mr-10 relative end-0">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+        </div>
+        <table class="w-[90%] table-auto border-collapse border border-none m-10">
+          <thead>
+            <tr class="text-lg">
+              <th class="border border-none px-4 py-2 text-center">Nombre</th>
+              <th class="border border-none px-4 py-2 text-center">Apellidos</th>
+              <th class="border border-none px-4 py-2 text-center">Correo</th>
+              <th class="border border-none px-4 py-2 text-center">Matrícula</th>
+              <th class="border border-none px-4 py-2 text-center">Teléfono</th>
+              <th class="border border-none px-4 py-2 text-center">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if usuarios %}
+              {% for usuario in usuarios %}
+                <tr class="hover:bg-gray-100 border-b border-black" data-matricula="{{ usuario.matricula|escape }}" data-nombre="{{ usuario.nombre|escape }}" data-apellidos="{{ usuario.apellidos|escape }}" data-correo="{{ usuario.correo|escape }}" data-telefono="{{ usuario.telefono|default_if_none:''|escape }}">
+                  <td class="border border-none px-4 py-2 text-center">{{ usuario.nombre }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ usuario.apellidos }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ usuario.correo }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ usuario.matricula }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ usuario.telefono }}</td>
+                  <td class="border border-none px-4 py-2 text-center">
+                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td class="px-4 py-2" colspan="6">No hay usuarios registrados.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <div id="employee-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Editar Usuario</h2>
+        <form id="employee-form" method="post" action="{% url 'user' %}">
+          {% csrf_token %}
+          <input type="hidden" name="matricula" id="modal-matricula" />
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Nombre</label>
+              <input id="modal-nombre" name="nombre" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Apellidos</label>
+              <input id="modal-apellidos" name="apellidos" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Correo</label>
+              <input id="modal-correo" name="correo" type="email" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Contraseña</label>
+              <input id="modal-contrasena" name="contraseña" type="password" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Teléfono</label>
+              <input id="modal-telefono" name="telefono" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <!-- No hay rol/puesto para Usuario; campos anteriores mantienen estructura -->
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        const modal = document.getElementById('employee-modal')
+        const closeBtn = document.getElementById('modal-close')
+        const cancelBtn = document.getElementById('modal-cancel')
+      
+        function openModal() {
+          modal.classList.remove('hidden')
+          modal.classList.add('flex')
+        }
+      
+        function closeModal() {
+          modal.classList.add('hidden')
+          modal.classList.remove('flex')
+        }
+      
+        function fillModalFromRow(row) {
+          document.getElementById('modal-matricula').value = row.dataset.matricula || ''
+          document.getElementById('modal-nombre').value = row.dataset.nombre || ''
+          document.getElementById('modal-apellidos').value = row.dataset.apellidos || ''
+          document.getElementById('modal-correo').value = row.dataset.correo || ''
+          document.getElementById('modal-contrasena').value = ''
+          document.getElementById('modal-telefono').value = row.dataset.telefono || ''
+        }
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            const row = e.target.closest('tr')
+            if (!row) return
+            fillModalFromRow(row)
+            openModal()
+          })
+        })
+        closeBtn && closeBtn.addEventListener('click', closeModal)
+        cancelBtn && cancelBtn.addEventListener('click', closeModal)
+        modal &&
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal()
+          })
+        const searchInput = document.getElementById('search-input')
+        const searchBtn = document.getElementById('search-btn')
+        const tbody = document.querySelector('table tbody')
+        let noResultsRowId = 'no-results-row'
+      
+        function clearNoResults() {
+          const ex = document.getElementById(noResultsRowId)
+          if (ex) ex.remove()
+        }
+        function filterTable(term) {
+          term = (term || '').toLowerCase().trim()
+          clearNoResults()
+          const rows = Array.from(tbody.querySelectorAll('tr'))
+          let visible = 0
+          rows.forEach((row) => {
+            const fields = [row.dataset.matricula || '', row.dataset.nombre || '', row.dataset.apellidos || '', row.dataset.correo || '', row.dataset.telefono || '']
+            const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
+            if (matches) {
+              row.style.display = ''
+              visible++
+            } else {
+              row.style.display = 'none'
+            }
+          })
+          if (visible === 0) {
+            const tr = document.createElement('tr')
+            tr.id = noResultsRowId
+            tr.innerHTML = `<td class="px-4 py-2 text-center" colspan="6">No se encontraron resultados.</td>`
+            tbody.appendChild(tr)
+          }
+        }
+        function debounce(fn, wait) {
+          let t
+          return function (...args) {
+            clearTimeout(t)
+            t = setTimeout(() => fn.apply(this, args), wait)
+          }
+        }
+        const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
+        searchInput && searchInput.addEventListener('input', debouncedFilter)
+        searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      
+        // Toast auto-hide and close handling
+        const toasts = document.querySelectorAll('#toast-container .toast')
+        toasts.forEach((t) => {
+          const close = t.querySelector('.toast-close')
+          const hide = () => t.remove()
+          // auto hide after 4s
+          const timer = setTimeout(hide, 4000)
+          close &&
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              hide()
+            })
+        })
+      })()
+    </script>
+  </body>
+</html>

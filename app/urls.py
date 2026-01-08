@@ -7,6 +7,7 @@ from app.employee.employee_view import EmployeeView
 from app.entry.entry_view import EntryView
 from app.allocation.allocation_view import AllocationView
 from app.notification.notification_view import NotificationView
+from app.user.user_view import UserView
 
 urlpatterns = [
     path('', RootView.as_view(), name='home'),
@@ -17,4 +18,5 @@ urlpatterns = [
     path('entry/', EntryView.as_view(), name='entry'),
     path('allocation/', AllocationView.as_view(), name='allocation'),
     path('notification/', NotificationView.as_view(), name='notification'),
+    path('user/', UserView.as_view(), name='user'),
 ]

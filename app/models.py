@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.hashers import make_password, identify_hasher
 
 # Create your models here.
 
@@ -51,3 +52,30 @@ class Empleado(models.Model):
     class Meta:
         verbose_name = "Empleado"
         verbose_name_plural = "Empleados"
+
+
+class Usuario(models.Model):
+    nombre = models.CharField(max_length=100, verbose_name="Nombre")
+    apellidos = models.CharField(max_length=150, verbose_name="Apellidos")
+    matricula = models.CharField(
+        max_length=50, unique=True, verbose_name="Matrícula")
+    correo = models.EmailField(unique=True, verbose_name="Correo")
+    telefono = models.CharField(
+        max_length=30, blank=True, null=True, verbose_name="Teléfono")
+    contraseña = models.CharField(max_length=128, verbose_name="Contraseña")
+
+    def __str__(self):
+        return f"{self.nombre} {self.apellidos} ({self.matricula})"
+
+    def save(self, *args, **kwargs):
+        # Hashear la contraseña si no está ya hasheada
+        if self.contraseña:
+            try:
+                identify_hasher(self.contraseña)
+            except (ValueError, TypeError):
+                self.contraseña = make_password(self.contraseña)
+        super().save(*args, **kwargs)
+
+    class Meta:
+        verbose_name = "Usuario"
+        verbose_name_plural = "Usuarios"
