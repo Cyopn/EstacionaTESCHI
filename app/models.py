@@ -11,6 +11,11 @@ class Area(models.Model):
     capacidad_disponible = models.PositiveIntegerField(
         verbose_name="Capacidad disponible", default=0)
 
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
     def __str__(self):
         return self.nombre
 
@@ -28,6 +33,11 @@ class Empleado(models.Model):
         max_length=30, blank=True, null=True, verbose_name="Teléfono")
     numero_empleado = models.PositiveIntegerField(
         unique=True, verbose_name="Número de empleado")
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
 
     class Rol(models.TextChoices):
         JEFE_AREA = 'JEFE_AREA', 'Jefe de área'
@@ -64,6 +74,11 @@ class Usuario(models.Model):
         max_length=30, blank=True, null=True, verbose_name="Teléfono")
     contraseña = models.CharField(max_length=128, verbose_name="Contraseña")
 
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
     def __str__(self):
         return f"{self.nombre} {self.apellidos} ({self.matricula})"
 
@@ -79,3 +94,38 @@ class Usuario(models.Model):
     class Meta:
         verbose_name = "Usuario"
         verbose_name_plural = "Usuarios"
+
+
+class Vehiculo(models.Model):
+    placa = models.CharField(max_length=20, unique=True, verbose_name="Placa")
+    marca = models.CharField(max_length=50, verbose_name="Marca")
+    modelo = models.CharField(max_length=50, verbose_name="Modelo")
+    color = models.CharField(max_length=30, verbose_name="Color")
+
+    class TipoVehiculo(models.TextChoices):
+        AUTOMOVIL = 'AUTOMOVIL', 'Automóvil'
+        MOTOCICLETA = 'MOTOCICLETA', 'Motocicleta'
+        OTRO = 'OTRO', 'Otro'
+
+    tipo_vehiculo = models.CharField(max_length=20, choices=TipoVehiculo.choices,
+                                     default=TipoVehiculo.AUTOMOVIL, verbose_name="Tipo de vehículo")
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
+    def __str__(self):
+        return f"{self.placa} - {self.marca} {self.modelo}"
+
+    class Meta:
+        verbose_name = "Vehículo"
+        verbose_name_plural = "Vehículos"
+    usuario = models.ForeignKey(
+        'Usuario',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='vehiculos',
+        verbose_name='Usuario'
+    )

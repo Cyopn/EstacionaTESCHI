@@ -108,6 +108,7 @@
         <form id="employee-form" method="post" action="{% url 'employee' %}">
           {% csrf_token %}
           <input type="hidden" name="numero_empleado" id="modal-numero_empleado" />
+          <input type="hidden" id="modal-action" name="action" value="" />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium">Nombre</label>
@@ -149,6 +150,7 @@
             </div>
           </div>
           <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-delete" class="px-6 py-2 bg-red-500/30 border border-red-500 rounded-full cursor-pointer">Eliminar</button>
             <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
             <button type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
           </div>
@@ -190,6 +192,19 @@
             openModal()
           })
         })
+        const deleteBtn = document.getElementById('modal-delete')
+        deleteBtn &&
+          deleteBtn.addEventListener('click', function () {
+            const numero = document.getElementById('modal-numero_empleado').value || ''
+            if (!numero) {
+              alert('No hay número de empleado seleccionado para eliminar.')
+              return
+            }
+            if (!confirm(`Eliminar empleado #${numero}? Esta acción no se puede deshacer.`)) return
+            const actionInput = document.getElementById('modal-action')
+            if (actionInput) actionInput.value = 'delete'
+            document.getElementById('employee-form').submit()
+          })
         closeBtn && closeBtn.addEventListener('click', closeModal)
         cancelBtn && cancelBtn.addEventListener('click', closeModal)
         modal &&

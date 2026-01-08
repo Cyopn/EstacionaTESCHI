@@ -13,6 +13,17 @@ class EmployeeView(View):
     def post(self, request):
         numero = request.POST.get('numero_empleado')
         if not numero:
+            messages.error(request, 'Número de empleado no proporcionado.')
+            return redirect(request.path)
+
+        action = request.POST.get('action')
+        if action == 'delete':
+            try:
+                empleado = Empleado.objects.get(numero_empleado=numero)
+                empleado.delete()
+                messages.success(request, 'Empleado eliminado correctamente.')
+            except Empleado.DoesNotExist:
+                messages.error(request, 'Empleado no encontrado.')
             return redirect(request.path)
 
         empleado = get_object_or_404(Empleado, numero_empleado=numero)

@@ -1,0 +1,406 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <title>Vehiculos - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <!-- Toast container -->
+    <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'success' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-green-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% elif 'error' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-red-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% else %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-gray-700 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <main class="w-full h-[88%]">
+      <img src="{% static 'images/bg-vehicle.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />
+      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+        <h1 class="text-3xl m-4 text-center">Gestion de vehiculos</h1>
+        <div class="w-full px-10 flex items-center">
+          <div class="w-1/2">
+            <div class="mr-10 relative w-[50%]">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+          <div class="w-1/2 flex justify-end">
+            <button id="add-vehicle-btn" class="relative w-[50%] flex cursor-pointer" type="button">
+              <span class="absolute top-0 start-0 p-2 items-center cursor-pointer text-lg"><span class="fi fi-br-plus"></span></span>
+              <label class="p-2 pl-9 pr-5 text-black text-xl font-semibold rounded-xl text-gray-700 rounded-full bg-gray-200/80 cursor-pointer">Agregar vehiculo</label>
+            </button>
+          </div>
+        </div>
+        <table class="w-[90%] table-auto border-collapse border border-none m-10">
+          <thead>
+            <tr class="text-lg">
+              <th class="border border-none px-4 py-2 text-center">Placa</th>
+              <th class="border border-none px-4 py-2 text-center">Marca</th>
+              <th class="border border-none px-4 py-2 text-center">Modelo</th>
+              <th class="border border-none px-4 py-2 text-center">Color</th>
+              <th class="border border-none px-4 py-2 text-center">Tipo vehiculo</th>
+              <th class="border border-none px-4 py-2 text-center">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if vehiculos %}
+              {% for vehiculo in vehiculos %}
+                <tr class="hover:bg-gray-100 border-b border-black" data-placa="{{ vehiculo.placa|escape }}" data-marca="{{ vehiculo.marca|escape }}" data-modelo="{{ vehiculo.modelo|escape }}" data-color="{{ vehiculo.color|escape }}" data-tipo="{{ vehiculo.tipo_vehiculo|escape }}" data-usuario="{{ vehiculo.usuario.id|default_if_none:'' }}">
+                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.placa }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.marca }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.modelo }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.color }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.get_tipo_vehiculo_display }}</td>
+                  <td class="border border-none px-4 py-2 text-center">
+                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td class="px-4 py-2" colspan="6">No hay vehículos registrados.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <div id="employee-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 id="modal-title" class="text-2xl font-bold mb-4">Editar Vehículo</h2>
+        <form id="vehicle-form" method="post" action="{% url 'vehicle' %}">
+          {% csrf_token %}
+          <input type="hidden" id="modal-action" name="action" value="" />
+          <div>
+            <label class="block text-sm font-medium">Placa</label>
+            <input id="modal-placa" name="placa" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Marca</label>
+              <input id="modal-marca" name="marca" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Modelo</label>
+              <input id="modal-modelo" name="modelo" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Color</label>
+              <input id="modal-color" name="color" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Tipo de vehículo</label>
+              <select id="modal-tipo" name="tipo_vehiculo" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="AUTOMOVIL">Automóvil</option>
+                <option value="MOTOCICLETA">Motocicleta</option>
+                <option value="OTRO">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Usuario</label>
+              <select id="modal-usuario" name="usuario" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="">Sin usuario</option>
+                {% for u in usuarios %}
+                  <option value="{{ u.id }}">{{ u.nombre }} {{ u.apellidos }} — {{ u.matricula }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-delete" class="px-6 py-2 bg-red-500/30 border border-red-500 rounded-full cursor-pointer">Eliminar</button>
+            <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Create Vehicle Modal -->
+    <div id="vehicle-create-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="create-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Crear Vehículo</h2>
+        <form id="vehicle-create-form" method="post" action="{% url 'vehicle' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create" />
+          <div>
+            <label class="block text-sm font-medium">Placa</label>
+            <input id="create-modal-placa" name="placa" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div>
+              <label class="block text-sm font-medium">Marca</label>
+              <input id="create-modal-marca" name="marca" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Modelo</label>
+              <input id="create-modal-modelo" name="modelo" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Color</label>
+              <input id="create-modal-color" name="color" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Tipo de vehículo</label>
+              <select id="create-modal-tipo" name="tipo_vehiculo" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="AUTOMOVIL">Automóvil</option>
+                <option value="MOTOCICLETA">Motocicleta</option>
+                <option value="OTRO">Otro</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Usuario</label>
+              <select id="create-modal-usuario" name="usuario" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="">Sin usuario</option>
+                {% for u in usuarios %}
+                  <option value="{{ u.id }}">{{ u.nombre }} {{ u.apellidos }} — {{ u.matricula }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="create-modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="create-modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Crear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        const modal = document.getElementById('employee-modal')
+        const closeBtn = document.getElementById('modal-close')
+        const cancelBtn = document.getElementById('modal-cancel')
+      
+        function openModal() {
+          modal.classList.remove('hidden')
+          modal.classList.add('flex')
+        }
+      
+        function closeModal() {
+          modal.classList.add('hidden')
+          modal.classList.remove('flex')
+        }
+      
+        function openCreateModal() {
+          const createModalElem = document.getElementById('vehicle-create-modal')
+          if (!createModalElem) {
+            // fallback: reuse edit modal
+            if (document.getElementById('modal-title')) document.getElementById('modal-title').textContent = 'Crear Vehículo'
+            document.getElementById('modal-placa') && (document.getElementById('modal-placa').value = '')
+            document.getElementById('modal-placa') && (document.getElementById('modal-placa').readOnly = false)
+            document.getElementById('modal-marca') && (document.getElementById('modal-marca').value = '')
+            document.getElementById('modal-modelo') && (document.getElementById('modal-modelo').value = '')
+            document.getElementById('modal-color') && (document.getElementById('modal-color').value = '')
+            if (document.getElementById('modal-tipo')) document.getElementById('modal-tipo').value = 'AUTOMOVIL'
+            const submit = document.getElementById('modal-submit')
+            if (submit) submit.textContent = 'Crear'
+            const deleteBtn = document.getElementById('modal-delete')
+            if (deleteBtn) deleteBtn.style.display = 'none'
+            openModal()
+            return
+          }
+          // clear create modal fields
+          const cPlaca = document.getElementById('create-modal-placa')
+          cPlaca && (cPlaca.value = '')
+          const cMarca = document.getElementById('create-modal-marca')
+          cMarca && (cMarca.value = '')
+          const cModelo = document.getElementById('create-modal-modelo')
+          cModelo && (cModelo.value = '')
+          const cColor = document.getElementById('create-modal-color')
+          cColor && (cColor.value = '')
+          const cTipo = document.getElementById('create-modal-tipo')
+          cTipo && (cTipo.value = 'AUTOMOVIL')
+          const cUsuario = document.getElementById('create-modal-usuario')
+          cUsuario && (cUsuario.value = '')
+          createModalElem.classList.remove('hidden')
+          createModalElem.classList.add('flex')
+        }
+      
+        function fillModalFromRow(row) {
+          if (document.getElementById('modal-title')) document.getElementById('modal-title').textContent = 'Editar Vehículo'
+          document.getElementById('modal-placa').value = row.dataset.placa || ''
+          document.getElementById('modal-placa').readOnly = true
+          document.getElementById('modal-marca').value = row.dataset.marca || ''
+          document.getElementById('modal-modelo').value = row.dataset.modelo || ''
+          document.getElementById('modal-color').value = row.dataset.color || ''
+          if (document.getElementById('modal-tipo')) document.getElementById('modal-tipo').value = row.dataset.tipo || 'AUTOMOVIL'
+          if (document.getElementById('modal-usuario')) document.getElementById('modal-usuario').value = row.dataset.usuario || ''
+          const submit = document.getElementById('modal-submit')
+          if (submit) submit.textContent = 'Modificar'
+          const deleteBtn = document.getElementById('modal-delete')
+          if (deleteBtn) deleteBtn.style.display = ''
+        }
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            const row = e.target.closest('tr')
+            if (!row) return
+            fillModalFromRow(row)
+            openModal()
+          })
+        })
+        const addBtn = document.getElementById('add-vehicle-btn')
+        addBtn && addBtn.addEventListener('click', openCreateModal)
+        closeBtn && closeBtn.addEventListener('click', closeModal)
+        cancelBtn && cancelBtn.addEventListener('click', closeModal)
+        const deleteBtn = document.getElementById('modal-delete')
+        deleteBtn &&
+          deleteBtn.addEventListener('click', function () {
+            const placa = document.getElementById('modal-placa').value || ''
+            if (!placa) {
+              alert('No hay placa seleccionada para eliminar.')
+              return
+            }
+            if (!confirm(`Eliminar vehículo con placa ${placa}? Esta acción no se puede deshacer.`)) return
+            const actionInput = document.getElementById('modal-action')
+            if (actionInput) actionInput.value = 'delete'
+            document.getElementById('vehicle-form').submit()
+          })
+        modal &&
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal()
+          })
+        const searchInput = document.getElementById('search-input')
+        const searchBtn = document.getElementById('search-btn')
+        const tbody = document.querySelector('table tbody')
+        let noResultsRowId = 'no-results-row'
+      
+        function clearNoResults() {
+          const ex = document.getElementById(noResultsRowId)
+          if (ex) ex.remove()
+        }
+        function filterTable(term) {
+          term = (term || '').toLowerCase().trim()
+          clearNoResults()
+          const rows = Array.from(tbody.querySelectorAll('tr'))
+          let visible = 0
+          rows.forEach((row) => {
+            const fields = [row.dataset.placa || '', row.dataset.marca || '', row.dataset.modelo || '', row.dataset.color || '', row.dataset.tipo || '']
+            const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
+            if (matches) {
+              row.style.display = ''
+              visible++
+            } else {
+              row.style.display = 'none'
+            }
+          })
+          if (visible === 0) {
+            const tr = document.createElement('tr')
+            tr.id = noResultsRowId
+            tr.innerHTML = `<td class="px-4 py-2 text-center" colspan="6">No se encontraron resultados.</td>`
+            tbody.appendChild(tr)
+          }
+        }
+        function debounce(fn, wait) {
+          let t
+          return function (...args) {
+            clearTimeout(t)
+            t = setTimeout(() => fn.apply(this, args), wait)
+          }
+        }
+        const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
+        searchInput && searchInput.addEventListener('input', debouncedFilter)
+        searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      
+        // Client-side validation for placa on submit (except delete action)
+        const vehicleForm = document.getElementById('vehicle-form')
+        vehicleForm &&
+          vehicleForm.addEventListener('submit', function (e) {
+            const action = (document.getElementById('modal-action') && document.getElementById('modal-action').value) || ''
+            if (action === 'delete') return
+            const placaInput = document.getElementById('modal-placa')
+            if (!placaInput) return
+            const placa = (placaInput.value || '').trim()
+            if (!placa) {
+              alert('La placa es obligatoria.')
+              e.preventDefault()
+              return
+            }
+            const pattern = /^[A-Z0-9-]{3,10}$/i
+            if (!pattern.test(placa)) {
+              alert('Placa inválida. Solo letras, números y guion, 3-10 caracteres.')
+              e.preventDefault()
+              return
+            }
+            placaInput.value = placa.toUpperCase()
+          })
+      
+        // Create modal handlers and validation
+        const createModal = document.getElementById('vehicle-create-modal')
+        const createClose = document.getElementById('create-modal-close')
+        const createCancel = document.getElementById('create-modal-cancel')
+        const createForm = document.getElementById('vehicle-create-form')
+        createClose && createClose.addEventListener('click', () => createModal && createModal.classList.add('hidden'))
+        createCancel && createCancel.addEventListener('click', () => createModal && createModal.classList.add('hidden'))
+        createModal &&
+          createModal.addEventListener('click', function (e) {
+            if (e.target === createModal) createModal.classList.add('hidden')
+          })
+        createForm &&
+          createForm.addEventListener('submit', function (e) {
+            const placaInput = document.getElementById('create-modal-placa')
+            if (!placaInput) return
+            const placa = (placaInput.value || '').trim()
+            if (!placa) {
+              alert('La placa es obligatoria.')
+              e.preventDefault()
+              return
+            }
+            const pattern = /^[A-Z0-9-]{3,10}$/i
+            if (!pattern.test(placa)) {
+              alert('Placa inválida. Solo letras, números y guion, 3-10 caracteres.')
+              e.preventDefault()
+              return
+            }
+            placaInput.value = placa.toUpperCase()
+          })
+      
+        // Toast auto-hide and close handling
+        const toasts = document.querySelectorAll('#toast-container .toast')
+        toasts.forEach((t) => {
+          const close = t.querySelector('.toast-close')
+          const hide = () => t.remove()
+          // auto hide after 4s
+          const timer = setTimeout(hide, 4000)
+          close &&
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              hide()
+            })
+        })
+      })()
+    </script>
+  </body>
+</html>
