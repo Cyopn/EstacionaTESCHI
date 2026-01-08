@@ -1,0 +1,75 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <title>Acceso - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <div>
+      <div class="absolute w-full h-full flex">
+        <div class="absolute h-full w-4/25 bg-[#053172] rounded-tr-[13vh] start-0 top-0"></div>
+        <div class="absolute h-[76vh] w-4/25 bg-[#0064FA] rounded-tr-[13vh] start-0 bottom-0 z-2"></div>
+        <img src="{% static 'images/bg-auto2.png' %}" alt="logo" border="0" class="w-[42vw] absolute bottom-3 start-0 z-3" />
+      </div>
+    </div>
+    <div class="absolute start-4/25 top-[12%] z-5 flex flex-col w-full h-full">
+      <div class="fixed start-0 text-4xl w-full text-center font-bold py-5 flex justify-center items-center">
+        <h1 class="border-b-4 border-black px-90">Area de Acceso</h1>
+      </div>
+      <div class="relative top-[10%] flex w-full h-full">
+        <div class="w-1/4 h-[76%]">
+          <div class="flex flex-col justify-center items-center h-[65%] rounded-lg shadow-xl m-3 mx-5 border-2 border-gray-400/80 py-5">
+            <div class="w-full p-5 text-xl flex gap-5">
+              <span class="p-1 pr-2">Placa</span>
+              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="placa"></label>
+            </div>
+            <div class="w-full p-5 text-xl flex gap-5">
+              <span class="p-1 pr-2">Modelo</span>
+              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="modelo"></label>
+            </div>
+            <div class="w-full p-5 text-xl flex gap-5">
+              <span class="p-1 pr-2">Cajon asignado</span>
+              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="cajon"></label>
+            </div>
+            <div class="w-full p-5 text-xl flex gap-5">
+              <span class="p-1 pr-2">Propietario</span>
+              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="propietario"></label>
+            </div>
+            <div class="w-full p-5 text-xl flex gap-5">
+              <span class="p-1 pr-2">Matricula</span>
+              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="matricula"></label>
+            </div>
+          </div>
+        </div>
+        <div class="w-3/4 h-[75%] flex flex-col">
+          <div class="w-[74%] h-4/5 rounded-lg shadow-xl m-2 border-2 border-red-500">
+            <video class="w-full h-full rounded-lg" autoplay muted>
+              <source src="{% static 'videos/camara.mp4' %}" type="video/mp4" />
+              Your browser does not support the video tag.
+            </video>
+          </div>
+          <div class="w-[74%] h-1/5 rounded-lg shadow-xl m-2 border-2 border-gray-400/80">
+            <div class="w-full h-full flex items-center flex flex-col">
+              <span class="text-xl">Evento: <label for="event"></label></span>
+              <div class="w-[90%] text-2xl text-center m-3 bg-[#45FF6D] p-5 rounded-xl"><label for="entry"></label></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
