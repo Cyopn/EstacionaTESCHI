@@ -17,7 +17,7 @@
         <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
         <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
       </a>
-      <a class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
     </nav>
     <div>
       <div class="absolute w-full h-full flex">
@@ -58,14 +58,15 @@
         <div class="w-3/4 h-[75%] flex flex-col">
           <div class="w-[74%] h-4/5 rounded-lg shadow-xl m-2 border-2 border-red-500">
             <video class="w-full h-full rounded-lg" autoplay muted>
-              <source src="{% static 'videos/camara.mp4' %}" type="video/mp4" />
-              Your browser does not support the video tag.
+              <source src="{% static 'videos/camara.mp4' %}" type="video/mp4" />Your browser does not support the video tag.
             </video>
           </div>
           <div class="w-[74%] h-1/5 rounded-lg shadow-xl m-2 border-2 border-gray-400/80">
             <div class="w-full h-full flex items-center flex flex-col">
               <span class="text-xl">Evento: <label for="event"></label></span>
-              <div class="w-[90%] text-2xl text-center m-3 bg-[#45FF6D] p-5 rounded-xl"><label for="entry"></label></div>
+              <div class="w-[90%] text-2xl text-center m-3 bg-[#45FF6D] p-5 rounded-xl">
+                <label for="entry"></label>
+              </div>
             </div>
           </div>
         </div>

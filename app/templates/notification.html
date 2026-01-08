@@ -1,0 +1,51 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <title>Notificaciones - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+    </nav>
+    <div>
+      <div class="absolute w-full h-full flex">
+        <div class="absolute h-full w-4/25 bg-[#053172] rounded-tr-[13vh] start-0 top-0"></div>
+        <div class="absolute h-[76vh] w-4/25 bg-[#0064FA] rounded-tr-[13vh] start-0 bottom-0 z-2"></div>
+      </div>
+    </div>
+    <div class="absolute start-4/25 top-[12%] z-5 flex flex-col w-full h-full flex flex-col">
+      <div class="fixed start-0 w-full text-center py-5 flex flex-col justify-center items-center">
+        <h1 class="px-90 font-bold text-4xl">Notificaciones</h1>
+        <div class="w-full flex items-center justify-end py-5">
+          <div class="w-[30%]">
+            <div class="relative mr-10 end-0">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer z-20 text-black"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="relative top-[10%] pt-10 flex w-full h-full">
+        <div class="w-21/25 h-[75%] flex flex-col items-center p-5">
+          <div class="w-[96%] rounded-lg shadow-xl mx-5 border-2 border-gray-400/80">
+            <div class="w-full h-full">
+              <div class="text-2xl p-5 flex">
+                <span class="px-5"><span class="fi fi-ss-bell-slash"></span></span>
+                <span class="px-5">No hay notificaciones nuevas</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
