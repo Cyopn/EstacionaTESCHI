@@ -70,7 +70,6 @@ class SanctionView(View):
             messages.success(request, 'Sanción creada correctamente.')
             return redirect(request.path)
 
-        # default: update existing sancion
         if sancion_id:
             try:
                 sanc = Sancion.objects.get(pk=sancion_id)

@@ -27,7 +27,6 @@ class LoginView(View):
             messages.error(request, 'Correo o contraseña incorrectos')
             return redirect(request.path)
 
-        # autenticación simple: guardar id de empleado en sesión
         request.session['empleado_id'] = empleado.id
         request.session['empleado_nombre'] = f"{empleado.nombre} {empleado.apellidos}"
 

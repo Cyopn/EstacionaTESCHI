@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <style>
+      .table-scroll-wrapper thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+      }
+      .table-scroll-wrapper {
+        overflow: auto;
+      }
+    </style>
     <title>Empleados - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
@@ -45,7 +56,7 @@
     <main class="w-full h-[88%]">
       <img src="{% static 'images/bg-employee.png' %}" alt="bg" border="0" class="absolute z-0 h-[25%] w-full top-[12%] object-cover" />
       <h1 class="relative text-4xl font-bold text-center bg-black w-full h-[10%] py-4 text-white">Administracion de Empleados</h1>
-      <div class="absolute w-[80%] h-[68%] top-[28%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+      <div class="absolute w-[80%] h-[68%] top-[28%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-hidden">
         <h1 class="text-2xl m-4 text-center">Gestion de empleados</h1>
         <div class="w-full flex items-center justify-end">
           <div class="w-[30%]">
@@ -55,48 +66,50 @@
             </div>
           </div>
         </div>
-        <table class="w-[90%] table-auto border-collapse border border-none m-10">
-          <thead>
-            <tr class="text-lg">
-              <th class="border border-none px-4 py-2 text-center">N. empleado</th>
-              <th class="border border-none px-4 py-2 text-center">Nombre</th>
-              <th class="border border-none px-4 py-2 text-center">Apellido</th>
-              <th class="border border-none px-4 py-2 text-center">Correo</th>
-              <th class="border border-none px-4 py-2 text-center">Rol</th>
-              <th class="border border-none px-4 py-2 text-center">Editar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if employees %}
-              {% for employee in employees %}
-                <tr class="hover:bg-gray-100 border-b border-black" data-numero-empleado="{{ employee.numero_empleado|escape }}" data-nombre="{{ employee.nombre|escape }}" data-apellidos="{{ employee.apellidos|escape }}" data-correo="{{ employee.correo|escape }}" data-contrasena="{{ employee.contrasena|escape }}" data-telefono="{{ employee.telefono|default_if_none:''|escape }}" data-rol="{{ employee.rol|escape }}" data-puesto="{{ employee.puesto|escape }}">
-                  <td class="border border-none px-4 py-2 text-center">{{ employee.numero_empleado }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ employee.nombre }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ employee.apellidos }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ employee.correo }}</td>
-                  <td class="border border-none px-4 py-2 text-center">
-                    {% if employee.rol == 'JEFE_AREA' %}
-                      <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#04DF34;">{{ employee.get_rol_display }}</span>
-                    {% elif employee.rol == 'GUARDIA' %}
-                      <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#FFE417;">{{ employee.get_rol_display }}</span>
-                    {% elif employee.rol == 'PATRULLA' %}
-                      <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#8392EE;">{{ employee.get_rol_display }}</span>
-                    {% else %}
-                      {{ employee.get_rol_display }}
-                    {% endif %}
-                  </td>
-                  <td class="border border-none px-4 py-2 text-center">
-                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
-                  </td>
-                </tr>
-              {% endfor %}
-            {% else %}
-              <tr>
-                <td class="px-4 py-2" colspan="6">No hay empleados registrados.</td>
+        <div class="table-scroll-wrapper w-[90%] m-10 overflow-auto" style="max-height:46vh;">
+          <table class="w-full table-auto border-collapse border border-none">
+            <thead>
+              <tr class="text-lg">
+                <th class="border border-none px-4 py-2 text-center">N. empleado</th>
+                <th class="border border-none px-4 py-2 text-center">Nombre</th>
+                <th class="border border-none px-4 py-2 text-center">Apellido</th>
+                <th class="border border-none px-4 py-2 text-center">Correo</th>
+                <th class="border border-none px-4 py-2 text-center">Rol</th>
+                <th class="border border-none px-4 py-2 text-center">Editar</th>
               </tr>
-            {% endif %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% if employees %}
+                {% for employee in employees %}
+                  <tr class="hover:bg-gray-100 border-b border-black" data-numero-empleado="{{ employee.numero_empleado|escape }}" data-nombre="{{ employee.nombre|escape }}" data-apellidos="{{ employee.apellidos|escape }}" data-correo="{{ employee.correo|escape }}" data-contrasena="{{ employee.contrasena|escape }}" data-telefono="{{ employee.telefono|default_if_none:''|escape }}" data-rol="{{ employee.rol|escape }}" data-puesto="{{ employee.puesto|escape }}">
+                    <td class="border border-none px-4 py-2 text-center">{{ employee.numero_empleado }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ employee.nombre }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ employee.apellidos }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ employee.correo }}</td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      {% if employee.rol == 'JEFE_AREA' %}
+                        <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#04DF34;">{{ employee.get_rol_display }}</span>
+                      {% elif employee.rol == 'GUARDIA' %}
+                        <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#FFE417;">{{ employee.get_rol_display }}</span>
+                      {% elif employee.rol == 'PATRULLA' %}
+                        <span class="inline-block px-3 py-1 rounded-xl font-semibold" style="background:#8392EE;">{{ employee.get_rol_display }}</span>
+                      {% else %}
+                        {{ employee.get_rol_display }}
+                      {% endif %}
+                    </td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td class="px-4 py-2" colspan="6">No hay empleados registrados.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
 

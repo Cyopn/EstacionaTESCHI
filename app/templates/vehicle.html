@@ -10,6 +10,17 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <style>
+      .table-scroll-wrapper thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+      }
+      .table-scroll-wrapper {
+        overflow: auto;
+      }
+    </style>
     <title>Vehiculos - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
@@ -44,7 +55,7 @@
     </nav>
     <main class="w-full h-[88%]">
       <img src="{% static 'images/bg-vehicle.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />
-      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-hidden">
         <h1 class="text-3xl m-4 text-center">Gestion de vehiculos</h1>
         <div class="w-full px-10 flex items-center">
           <div class="w-1/2">
@@ -60,38 +71,40 @@
             </button>
           </div>
         </div>
-        <table class="w-[90%] table-auto border-collapse border border-none m-10">
-          <thead>
-            <tr class="text-lg">
-              <th class="border border-none px-4 py-2 text-center">Placa</th>
-              <th class="border border-none px-4 py-2 text-center">Marca</th>
-              <th class="border border-none px-4 py-2 text-center">Modelo</th>
-              <th class="border border-none px-4 py-2 text-center">Color</th>
-              <th class="border border-none px-4 py-2 text-center">Tipo vehiculo</th>
-              <th class="border border-none px-4 py-2 text-center">Editar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if vehiculos %}
-              {% for vehiculo in vehiculos %}
-                <tr class="hover:bg-gray-100 border-b border-black" data-placa="{{ vehiculo.placa|escape }}" data-marca="{{ vehiculo.marca|escape }}" data-modelo="{{ vehiculo.modelo|escape }}" data-color="{{ vehiculo.color|escape }}" data-tipo="{{ vehiculo.tipo_vehiculo|escape }}" data-usuario="{{ vehiculo.usuario.id|default_if_none:'' }}">
-                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.placa }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.marca }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.modelo }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.color }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ vehiculo.get_tipo_vehiculo_display }}</td>
-                  <td class="border border-none px-4 py-2 text-center">
-                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
-                  </td>
-                </tr>
-              {% endfor %}
-            {% else %}
-              <tr>
-                <td class="px-4 py-2" colspan="6">No hay vehículos registrados.</td>
+        <div class="table-scroll-wrapper w-[90%] m-10 overflow-auto" style="max-height:46vh;">
+          <table class="w-full table-auto border-collapse border border-none">
+            <thead>
+              <tr class="text-lg">
+                <th class="border border-none px-4 py-2 text-center">Placa</th>
+                <th class="border border-none px-4 py-2 text-center">Marca</th>
+                <th class="border border-none px-4 py-2 text-center">Modelo</th>
+                <th class="border border-none px-4 py-2 text-center">Color</th>
+                <th class="border border-none px-4 py-2 text-center">Tipo vehiculo</th>
+                <th class="border border-none px-4 py-2 text-center">Editar</th>
               </tr>
-            {% endif %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% if vehiculos %}
+                {% for vehiculo in vehiculos %}
+                  <tr class="hover:bg-gray-100 border-b border-black" data-placa="{{ vehiculo.placa|escape }}" data-marca="{{ vehiculo.marca|escape }}" data-modelo="{{ vehiculo.modelo|escape }}" data-color="{{ vehiculo.color|escape }}" data-tipo="{{ vehiculo.tipo_vehiculo|escape }}" data-usuario="{{ vehiculo.usuario.id|default_if_none:'' }}">
+                    <td class="border border-none px-4 py-2 text-center">{{ vehiculo.placa }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ vehiculo.marca }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ vehiculo.modelo }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ vehiculo.color }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ vehiculo.get_tipo_vehiculo_display }}</td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td class="px-4 py-2" colspan="6">No hay vehículos registrados.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
 

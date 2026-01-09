@@ -10,6 +10,19 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <style>
+      /* Keep table header visible while scrolling tbody */
+      .table-scroll-wrapper thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+      }
+      /* Ensure the scroll wrapper doesn't collapse and provides a scrollbar */
+      .table-scroll-wrapper {
+        overflow: auto;
+      }
+    </style>
     <title>Vehiculos - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
@@ -44,7 +57,7 @@
     </nav>
     <main class="w-full h-[88%]">
       <img src="{% static 'images/bg-sanction.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />
-      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-hidden">
         <h1 class="text-3xl m-4 text-center">Gestion de sanciones</h1>
         <div class="w-full px-10 flex items-center">
           <div class="w-1/2">
@@ -60,50 +73,52 @@
             </button>
           </div>
         </div>
-        <table class="w-[90%] table-auto border-collapse border border-none m-10">
-          <thead>
-            <tr class="text-lg">
-              <th class="border border-none px-4 py-2 text-center">Placa</th>
-              <th class="border border-none px-4 py-2 text-center">Nombre</th>
-              <th class="border border-none px-4 py-2 text-center">Apellido</th>
-              <th class="border border-none px-4 py-2 text-center">Fecha</th>
-              <th class="border border-none px-4 py-2 text-center">Lugar de incidente</th>
-              <th class="border border-none px-4 py-2 text-center">Nivel de gravedad</th>
-              <th class="border border-none px-4 py-2 text-center">Editar</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% if sanciones %}
-              {% for sancion in sanciones %}
-                <tr class="hover:bg-gray-100 border-b border-black" data-sancion-id="{{ sancion.id }}" data-placa="{{ sancion.vehiculo.placa|default_if_none:''|escape }}" data-nombre="{{ sancion.usuario.nombre|default_if_none:''|escape }}" data-apellidos="{{ sancion.usuario.apellidos|default_if_none:''|escape }}" data-fecha="{{ sancion.fecha|date:'Y-m-d' }}" data-area="{{ sancion.area.nombre|default_if_none:''|escape }}" data-gravedad="{{ sancion.gravedad|escape }}" data-motivo="{{ sancion.motivo|truncatechars:50|escape }}" data-vehiculo-id="{{ sancion.vehiculo.id|default_if_none:'' }}" data-usuario-id="{{ sancion.usuario.id|default_if_none:'' }}" data-area-id="{{ sancion.area.id|default_if_none:'' }}">
-                  <td class="border border-none px-4 py-2 text-center">{{ sancion.vehiculo.placa }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ sancion.usuario.nombre }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ sancion.usuario.apellidos }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ sancion.fecha }}</td>
-                  <td class="border border-none px-4 py-2 text-center">{{ sancion.area.nombre }}</td>
-                  <td class="border border-none px-4 py-2 text-center">
-                    {% if sancion.gravedad == 'MODERADA' %}
-                      <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#89DD44;">{{ sancion.get_gravedad_display }}</span>
-                    {% elif sancion.gravedad == 'GRAVE' %}
-                      <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#FFDF1E;">{{ sancion.get_gravedad_display }}</span>
-                    {% elif sancion.gravedad == 'CRITICA' %}
-                      <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#C52700; color:#fff;">{{ sancion.get_gravedad_display }}</span>
-                    {% else %}
-                      {{ sancion.get_gravedad_display }}
-                    {% endif %}
-                  </td>
-                  <td class="border border-none px-4 py-2 text-center">
-                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
-                  </td>
-                </tr>
-              {% endfor %}
-            {% else %}
-              <tr>
-                <td class="px-4 py-2" colspan="7">No hay sanciones registradas.</td>
+        <div class="table-scroll-wrapper w-[90%] m-10 overflow-auto" style="max-height:46vh;">
+          <table class="w-full table-auto border-collapse border border-none">
+            <thead>
+              <tr class="text-lg">
+                <th class="border border-none px-4 py-2 text-center">Placa</th>
+                <th class="border border-none px-4 py-2 text-center">Nombre</th>
+                <th class="border border-none px-4 py-2 text-center">Apellido</th>
+                <th class="border border-none px-4 py-2 text-center">Fecha</th>
+                <th class="border border-none px-4 py-2 text-center">Lugar de incidente</th>
+                <th class="border border-none px-4 py-2 text-center">Nivel de gravedad</th>
+                <th class="border border-none px-4 py-2 text-center">Editar</th>
               </tr>
-            {% endif %}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {% if sanciones %}
+                {% for sancion in sanciones %}
+                  <tr class="hover:bg-gray-100 border-b border-black" data-sancion-id="{{ sancion.id }}" data-placa="{{ sancion.vehiculo.placa|default_if_none:''|escape }}" data-nombre="{{ sancion.usuario.nombre|default_if_none:''|escape }}" data-apellidos="{{ sancion.usuario.apellidos|default_if_none:''|escape }}" data-fecha="{{ sancion.fecha|date:'d-m-Y' }}" data-area="{{ sancion.area.nombre|default_if_none:''|escape }}" data-gravedad="{{ sancion.gravedad|escape }}" data-motivo="{{ sancion.motivo|truncatechars:50|escape }}" data-vehiculo-id="{{ sancion.vehiculo.id|default_if_none:'' }}" data-usuario-id="{{ sancion.usuario.id|default_if_none:'' }}" data-area-id="{{ sancion.area.id|default_if_none:'' }}">
+                    <td class="border border-none px-4 py-2 text-center">{{ sancion.vehiculo.placa }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ sancion.usuario.nombre }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ sancion.usuario.apellidos }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ sancion.fecha|date:'d-m-Y' }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ sancion.area.nombre }}</td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      {% if sancion.gravedad == 'MODERADA' %}
+                        <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#89DD44;">{{ sancion.get_gravedad_display }}</span>
+                      {% elif sancion.gravedad == 'GRAVE' %}
+                        <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#FFDF1E;">{{ sancion.get_gravedad_display }}</span>
+                      {% elif sancion.gravedad == 'CRITICA' %}
+                        <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#C52700; color:#fff;">{{ sancion.get_gravedad_display }}</span>
+                      {% else %}
+                        {{ sancion.get_gravedad_display }}
+                      {% endif %}
+                    </td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td class="px-4 py-2" colspan="7">No hay sanciones registradas.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
       </div>
     </main>
 
@@ -243,7 +258,6 @@
           return `${yyyy}-${mm}-${dd}`
         }
       
-        // set max attribute for date inputs to today
         const todayStr = getToday()
         const createFechaInput = document.getElementById('create-modal-fecha')
         const modalFechaInput = document.getElementById('modal-fecha')
@@ -262,7 +276,6 @@
       
         function openCreateModal() {
           if (!createModal) return
-          // clear fields
           const cm = document.getElementById('create-modal-motivo')
           const cf = document.getElementById('create-modal-fecha')
           const cg = document.getElementById('create-modal-gravedad')
@@ -301,7 +314,6 @@
           if (gravedadEl) gravedadEl.value = row.dataset.gravedad || 'MODERADA'
           if (usuarioEl) usuarioEl.value = row.dataset.usuarioId || ''
       
-          // filter vehiculos for this usuario before setting value
           if (vehiculoEl) {
             filterVehiculosByUsuario(usuarioEl ? usuarioEl.value : '', vehiculoEl)
             vehiculoEl.value = row.dataset.vehiculoId || ''
@@ -317,7 +329,6 @@
           btn.addEventListener('click', function (e) {
             const row = e.target.closest('tr')
             if (!row) return
-            // attach sancion id for deletion
             row.dataset.sancionId = row.dataset.sancionId || row.getAttribute('data-sancion-id') || ''
             fillModalFromRow(row)
             openModal()
@@ -329,7 +340,6 @@
         closeBtn && closeBtn.addEventListener('click', closeModal)
         cancelBtn && cancelBtn.addEventListener('click', closeModal)
       
-        // delete handler for edit modal
         deleteBtn &&
           deleteBtn.addEventListener('click', function () {
             const sancionId = document.getElementById('sancion-id').value || ''
@@ -343,7 +353,6 @@
             document.getElementById('sancion-form').submit()
           })
       
-        // hook up modal usuario -> vehiculo filtering for edit modal
         const modalUsuarioSelect = document.getElementById('modal-usuario')
         const modalVehiculoSelect = document.getElementById('modal-vehiculo')
         modalUsuarioSelect &&
@@ -351,7 +360,6 @@
             filterVehiculosByUsuario(this.value, modalVehiculoSelect)
           })
       
-        // helper to show toasts for errors/success
         function showToast(message, type = 'error') {
           const container = document.getElementById('toast-container')
           if (!container) return
@@ -416,7 +424,6 @@
         searchInput && searchInput.addEventListener('input', debouncedFilter)
         searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
       
-        // sancion form validation (basic)
         const sancionForm = document.getElementById('sancion-form')
         sancionForm &&
           sancionForm.addEventListener('submit', function (e) {
@@ -508,7 +515,6 @@
               return
             }
       
-            // fecha validation: required and not in future
             if (fechaEl) {
               const val = fechaEl.value || ''
               if (!val) {
@@ -554,7 +560,6 @@
             }
           })
       
-        // Filtrar vehículos por usuario en modal de creación
         const createUsuarioSelect = document.getElementById('create-modal-usuario')
         const createVehiculoSelect = document.getElementById('create-modal-vehiculo')
       
@@ -573,7 +578,6 @@
                 opt.disabled = false
                 if (!firstVisible && opt.value) firstVisible = opt.value
               } else if (opt.value === '') {
-                // always show the empty placeholder
                 opt.style.display = ''
                 opt.disabled = false
               } else {
@@ -582,14 +586,12 @@
               }
             }
           })
-          // enable or disable the select element itself depending on usuario selection
           if (!usuarioId) {
             vehSelect.disabled = true
             vehSelect.value = ''
           } else {
             vehSelect.disabled = false
           }
-          // if current value is disabled or empty, set to first visible
           const cur = vehSelect.value || ''
           const curOpt = Array.from(vehSelect.options).find((o) => o.value === cur)
           if (!curOpt || curOpt.disabled) {
@@ -601,15 +603,12 @@
           createUsuarioSelect.addEventListener('change', function () {
             filterVehiculosByUsuario(this.value, createVehiculoSelect)
           })
-        // inicializar filtro al cargar
         createUsuarioSelect && filterVehiculosByUsuario(createUsuarioSelect.value, createVehiculoSelect)
       
-        // Toast auto-hide and close handling
         const toasts = document.querySelectorAll('#toast-container .toast')
         toasts.forEach((t) => {
           const close = t.querySelector('.toast-close')
           const hide = () => t.remove()
-          // auto hide after 4s
           const timer = setTimeout(hide, 4000)
           close &&
             close.addEventListener('click', () => {

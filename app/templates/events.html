@@ -1,0 +1,541 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <style>
+      .table-scroll-wrapper thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+      }
+      .table-scroll-wrapper {
+        overflow: auto;
+      }
+      /* Make tbody scrollable while keeping thead sticky */
+      .table-scroll-wrapper table {
+        width: 100%;
+        border-collapse: collapse;
+        table-layout: fixed;
+      }
+      .table-scroll-wrapper thead {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+      .table-scroll-wrapper tbody {
+        display: block;
+        max-height: 32vh;
+        overflow: auto;
+        width: 100%;
+      }
+      .table-scroll-wrapper tbody tr {
+        display: table;
+        width: 100%;
+        table-layout: fixed;
+      }
+    </style>
+    <title>Eventos - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'success' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-green-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% elif 'error' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-red-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% else %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-gray-700 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <main class="w-full h-[88%]">
+      <img src="{% static 'images/bg-vehicle.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />
+      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-hidden">
+        <h1 class="text-3xl m-4 text-center font-semibold">Gestion de eventos</h1>
+        <div class="w-full px-10 flex items-center">
+          <div class="w-1/2">
+            <div class="mr-10 relative w-[50%]">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+          <div class="w-1/2 flex justify-end">
+            <button id="add-vehicle-btn" class="relative w-[50%] flex cursor-pointer" type="button">
+              <span class="absolute top-0 start-0 p-2 items-center cursor-pointer text-lg"><span class="fi fi-br-plus"></span></span>
+              <label class="p-2 pl-9 pr-5 text-black text-xl font-semibold rounded-xl text-gray-700 rounded-full bg-gray-200/80 cursor-pointer">Agregar evento</label>
+            </button>
+          </div>
+        </div>
+        <div class="table-scroll-wrapper w-[90%] m-10 overflow-auto" style="max-height:46vh;">
+          <table class="w-full table-auto border-collapse border border-none">
+            <thead>
+              <tr class="text-lg">
+                <th class="border border-none px-4 py-2 text-center">Nombre de evento</th>
+                <th class="border border-none px-4 py-2 text-center">Fecha de inicio</th>
+                <th class="border border-none px-4 py-2 text-center">Fecha de fin</th>
+                <th class="border border-none px-4 py-2 text-center">Area</th>
+                <th class="border border-none px-4 py-2 text-center">Descripcion</th>
+                <th class="border border-none px-4 py-2 text-center">Prioridad</th>
+                <th class="border border-none px-4 py-2 text-center">Editar</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if eventos %}
+                {% for evento in eventos %}
+                  <tr class="hover:bg-gray-100 border-b border-black" data-evento-id="{{ evento.id }}" data-nombre="{{ evento.nombre|default_if_none:''|escape }}" data-fecha-inicio="{{ evento.fecha_inicio|date:'d-m-Y' }}" data-fecha-fin="{{ evento.fecha_fin|date:'d-m-Y' }}" data-area="{{ evento.area.nombre|default_if_none:''|escape }}" data-area-id="{{ evento.area.id|default_if_none:'' }}" data-descripcion="{{ evento.descripcion|truncatechars:80|escape }}" data-prioridad="{{ evento.prioridad|escape }}">
+                    <td class="border border-none px-4 py-2 text-center">{{ evento.nombre }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ evento.fecha_inicio|date:'d-m-Y' }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ evento.fecha_fin|date:'d-m-Y' }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ evento.area.nombre }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ evento.descripcion|truncatechars:80 }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ evento.get_prioridad_display }}</td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td class="px-4 py-2" colspan="7">No hay eventos registrados.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <div id="event-create-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="create-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Crear Evento</h2>
+        <form id="event-create-form" method="post" action="{% url 'events' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Nombre</label>
+              <input id="create-modal-nombre" name="nombre" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Fecha inicio</label>
+              <input id="create-modal-fecha-inicio" type="date" name="fecha_inicio" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Fecha fin</label>
+              <input id="create-modal-fecha-fin" type="date" name="fecha_fin" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Área</label>
+              <select id="create-modal-area" name="area" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="">-- Seleccionar --</option>
+                {% for area in areas %}
+                  <option value="{{ area.id }}">{{ area.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium">Descripción</label>
+              <textarea id="create-modal-descripcion" name="descripcion" class="mt-1 w-full p-2 rounded bg-gray-200/80"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Prioridad</label>
+              <select id="create-modal-prioridad" name="prioridad" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="ALTA">Alta</option>
+                <option value="MEDIA">Media</option>
+                <option value="BAJA">Baja</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="create-modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="create-modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Crear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <div id="event-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Editar Evento</h2>
+        <form id="event-form" method="post" action="{% url 'events' %}">
+          {% csrf_token %}
+          <input type="hidden" id="modal-action" name="action" value="update" />
+          <input type="hidden" id="evento-id" name="evento_id" value="" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Nombre</label>
+              <input id="modal-nombre" name="nombre" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Fecha inicio</label>
+              <input id="modal-fecha-inicio" type="date" name="fecha_inicio" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Fecha fin</label>
+              <input id="modal-fecha-fin" type="date" name="fecha_fin" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Área</label>
+              <select id="modal-area" name="area" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="">-- Seleccionar --</option>
+                {% for area in areas %}
+                  <option value="{{ area.id }}">{{ area.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-span-2">
+              <label class="block text-sm font-medium">Descripción</label>
+              <textarea id="modal-descripcion" name="descripcion" class="mt-1 w-full p-2 rounded bg-gray-200/80"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Prioridad</label>
+              <select id="modal-prioridad" name="prioridad" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="ALTA">Alta</option>
+                <option value="MEDIA">Media</option>
+                <option value="BAJA">Baja</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-delete" class="px-6 py-2 bg-red-500/30 border border-red-500 rounded-full cursor-pointer">Eliminar</button>
+            <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <script>
+      ;(function () {
+        const modal = document.getElementById('event-modal')
+        const createModal = document.getElementById('event-create-modal')
+        const closeBtn = document.getElementById('modal-close')
+        const cancelBtn = document.getElementById('modal-cancel')
+      
+        function getToday() {
+          const d = new Date()
+          const yyyy = d.getFullYear()
+          const mm = String(d.getMonth() + 1).padStart(2, '0')
+          const dd = String(d.getDate()).padStart(2, '0')
+          return `${yyyy}-${mm}-${dd}`
+        }
+      
+        function parseDateDMY(dmy) {
+          if (!dmy) return ''
+          const parts = dmy.split('-')
+          if (parts.length !== 3) return ''
+          const [d, m, y] = parts
+          return `${y}-${m.padStart(2, '0')}-${d.padStart(2, '0')}`
+        }
+      
+        function showToast(message, type = 'error') {
+          const container = document.getElementById('toast-container')
+          if (!container) return
+          const t = document.createElement('div')
+          t.className = 'toast px-4 py-2 rounded shadow-lg text-white flex items-center gap-3'
+          if (type === 'success') t.classList.add('bg-green-600')
+          else if (type === 'error') t.classList.add('bg-red-600')
+          else t.classList.add('bg-gray-700')
+          t.innerHTML = `<div class="flex-1">${message}</div><button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>`
+          container.appendChild(t)
+          const close = t.querySelector('.toast-close')
+          const timer = setTimeout(() => t.remove(), 4000)
+          if (close)
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              t.remove()
+            })
+        }
+      
+        function markInvalid(el) {
+          if (!el) return
+          const prev = el.style.boxShadow
+          el.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'
+          el.focus()
+          setTimeout(() => {
+            el.style.boxShadow = prev
+          }, 2200)
+        }
+      
+        function openModal() {
+          if (!modal) return
+          modal.classList.remove('hidden')
+          modal.classList.add('flex')
+        }
+      
+        function closeModal() {
+          if (!modal) return
+          modal.classList.add('hidden')
+          modal.classList.remove('flex')
+        }
+      
+        function openCreateModal() {
+          if (!createModal) return
+          const nm = document.getElementById('create-modal-nombre')
+          const fi = document.getElementById('create-modal-fecha-inicio')
+          const ff = document.getElementById('create-modal-fecha-fin')
+          const pr = document.getElementById('create-modal-prioridad')
+          const ar = document.getElementById('create-modal-area')
+          const desc = document.getElementById('create-modal-descripcion')
+          if (nm) nm.value = ''
+          if (fi) fi.value = getToday()
+          if (ff) ff.value = getToday()
+          if (pr) pr.value = 'MEDIA'
+          if (ar) ar.value = ''
+          if (desc) desc.value = ''
+          createModal.classList.remove('hidden')
+          createModal.classList.add('flex')
+        }
+      
+        function fillModalFromRow(row) {
+          if (!row || !modal) return
+          const idEl = document.getElementById('evento-id')
+          const nameEl = document.getElementById('modal-nombre')
+          const fiEl = document.getElementById('modal-fecha-inicio')
+          const ffEl = document.getElementById('modal-fecha-fin')
+          const prEl = document.getElementById('modal-prioridad')
+          const arEl = document.getElementById('modal-area')
+          const descEl = document.getElementById('modal-descripcion')
+      
+          if (idEl) idEl.value = row.dataset.eventoId || ''
+          if (nameEl) nameEl.value = row.dataset.nombre || ''
+          if (fiEl) fiEl.value = parseDateDMY(row.dataset.fechaInicio || '')
+          if (ffEl) ffEl.value = parseDateDMY(row.dataset.fechaFin || '')
+          if (prEl) prEl.value = row.dataset.prioridad || 'MEDIA'
+          if (arEl) arEl.value = row.dataset.areaId || ''
+          if (descEl) descEl.value = row.dataset.descripcion || ''
+      
+          const submit = document.getElementById('modal-submit')
+          if (submit) submit.textContent = 'Modificar'
+          const deleteBtn = document.getElementById('modal-delete')
+          if (deleteBtn) deleteBtn.style.display = ''
+        }
+      
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            const row = e.target.closest('tr')
+            if (!row) return
+            fillModalFromRow(row)
+            openModal()
+          })
+        })
+      
+        const addBtn = document.getElementById('add-vehicle-btn')
+        addBtn && addBtn.addEventListener('click', openCreateModal)
+        closeBtn && closeBtn.addEventListener('click', closeModal)
+        cancelBtn && cancelBtn.addEventListener('click', closeModal)
+      
+        const deleteBtn = document.getElementById('modal-delete')
+        deleteBtn &&
+          deleteBtn.addEventListener('click', function () {
+            const eventoId = document.getElementById('evento-id').value || ''
+            if (!eventoId) {
+              showToast('No hay evento seleccionado para eliminar.', 'error')
+              return
+            }
+            if (!confirm(`Eliminar evento ${eventoId}? Esta acción no se puede deshacer.`)) return
+            const actionInput = document.getElementById('modal-action')
+            if (actionInput) actionInput.value = 'delete'
+            document.getElementById('event-form').submit()
+          })
+      
+        modal &&
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) closeModal()
+          })
+        createModal &&
+          createModal.addEventListener('click', function (e) {
+            if (e.target === createModal) createModal.classList.add('hidden')
+          })
+      
+        const searchInput = document.getElementById('search-input')
+        const searchBtn = document.getElementById('search-btn')
+        const tbody = document.querySelector('table tbody')
+        let noResultsRowId = 'no-results-row'
+      
+        function clearNoResults() {
+          const ex = document.getElementById(noResultsRowId)
+          if (ex) ex.remove()
+        }
+      
+        function filterTable(term) {
+          term = (term || '').toLowerCase().trim()
+          clearNoResults()
+          const rows = Array.from(tbody.querySelectorAll('tr'))
+          let visible = 0
+          rows.forEach((row) => {
+            const fields = [row.dataset.nombre || '', row.dataset.fechaInicio || '', row.dataset.fechaFin || '', row.dataset.area || '', row.dataset.prioridad || '', row.dataset.descripcion || '']
+            const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
+            if (matches) {
+              row.style.display = ''
+              visible++
+            } else {
+              row.style.display = 'none'
+            }
+          })
+          if (visible === 0) {
+            const tr = document.createElement('tr')
+            tr.id = noResultsRowId
+            tr.innerHTML = `<td class="px-4 py-2 text-center" colspan="7">No se encontraron resultados.</td>`
+            tbody.appendChild(tr)
+          }
+        }
+      
+        function debounce(fn, wait) {
+          let t
+          return function (...args) {
+            clearTimeout(t)
+            t = setTimeout(() => fn.apply(this, args), wait)
+          }
+        }
+      
+        const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
+        searchInput && searchInput.addEventListener('input', debouncedFilter)
+        searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      
+        const createClose = document.getElementById('create-modal-close')
+        const createCancel = document.getElementById('create-modal-cancel')
+        const createForm = document.getElementById('event-create-form')
+        createClose && createClose.addEventListener('click', () => createModal && createModal.classList.add('hidden'))
+        createCancel && createCancel.addEventListener('click', () => createModal && createModal.classList.add('hidden'))
+        createForm &&
+          createForm.addEventListener('submit', function (e) {
+            const nameEl = document.getElementById('create-modal-nombre')
+            const fiEl = document.getElementById('create-modal-fecha-inicio')
+            const ffEl = document.getElementById('create-modal-fecha-fin')
+            const name = ((nameEl && nameEl.value) || '').trim()
+            const fi = ((fiEl && fiEl.value) || '').trim()
+            const ff = ((ffEl && ffEl.value) || '').trim()
+            if (!name) {
+              showToast('El nombre es obligatorio.', 'error')
+              e.preventDefault()
+              markInvalid(nameEl)
+              return
+            }
+            if (!fi || !ff) {
+              showToast('Fechas inicio y fin son obligatorias.', 'error')
+              e.preventDefault()
+              markInvalid(fiEl)
+              markInvalid(ffEl)
+              return
+            }
+            const areaEl = document.getElementById('create-modal-area')
+            const descEl = document.getElementById('create-modal-descripcion')
+            const areaVal = (areaEl && areaEl.value) || ''
+            const descVal = ((descEl && descEl.value) || '').trim()
+            if (!descVal) {
+              showToast('La descripción es obligatoria.', 'error')
+              e.preventDefault()
+              markInvalid(descEl)
+              return
+            }
+            if (!areaVal) {
+              showToast('Debe seleccionar un área.', 'error')
+              e.preventDefault()
+              markInvalid(areaEl)
+              return
+            }
+            if (fi > getToday() || ff > getToday()) {
+            }
+            if (fi > ff) {
+              showToast('La fecha de inicio no puede ser posterior a la fecha fin.', 'error')
+              e.preventDefault()
+              markInvalid(fiEl)
+              markInvalid(ffEl)
+              return
+            }
+          })
+      
+        const eventForm = document.getElementById('event-form')
+        eventForm &&
+          eventForm.addEventListener('submit', function (e) {
+            const action = (document.getElementById('modal-action') && document.getElementById('modal-action').value) || ''
+            if (action === 'delete') return
+            const nameEl = document.getElementById('modal-nombre')
+            const fiEl = document.getElementById('modal-fecha-inicio')
+            const ffEl = document.getElementById('modal-fecha-fin')
+            const name = ((nameEl && nameEl.value) || '').trim()
+            const fi = ((fiEl && fiEl.value) || '').trim()
+            const ff = ((ffEl && ffEl.value) || '').trim()
+            if (!name) {
+              showToast('El nombre es obligatorio.', 'error')
+              e.preventDefault()
+              markInvalid(nameEl)
+              return
+            }
+            if (!fi || !ff) {
+              showToast('Fechas inicio y fin son obligatorias.', 'error')
+              e.preventDefault()
+              markInvalid(fiEl)
+              markInvalid(ffEl)
+              return
+            }
+            const areaEl = document.getElementById('modal-area')
+            const descEl = document.getElementById('modal-descripcion')
+            const areaVal = (areaEl && areaEl.value) || ''
+            const descVal = ((descEl && descEl.value) || '').trim()
+            if (!descVal) {
+              showToast('La descripción es obligatoria.', 'error')
+              e.preventDefault()
+              markInvalid(descEl)
+              return
+            }
+            if (!areaVal) {
+              showToast('Debe seleccionar un área.', 'error')
+              e.preventDefault()
+              markInvalid(areaEl)
+              return
+            }
+            if (fi > ff) {
+              showToast('La fecha de inicio no puede ser posterior a la fecha fin.', 'error')
+              e.preventDefault()
+              markInvalid(fiEl)
+              markInvalid(ffEl)
+              return
+            }
+          })
+      
+        const toasts = document.querySelectorAll('#toast-container .toast')
+        toasts.forEach((t) => {
+          const close = t.querySelector('.toast-close')
+          const hide = () => t.remove()
+          const timer = setTimeout(hide, 4000)
+          close &&
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              hide()
+            })
+        })
+      })()
+    </script>
+  </body>
+</html>
