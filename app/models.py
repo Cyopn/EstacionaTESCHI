@@ -83,7 +83,6 @@ class Usuario(models.Model):
         return f"{self.nombre} {self.apellidos} ({self.matricula})"
 
     def save(self, *args, **kwargs):
-        # Hashear la contraseña si no está ya hasheada
         if self.contraseña:
             try:
                 identify_hasher(self.contraseña)
@@ -181,3 +180,39 @@ class Sancion(models.Model):
     class Meta:
         verbose_name = "Sanción"
         verbose_name_plural = "Sanciones"
+
+
+class Evento(models.Model):
+    nombre = models.CharField(max_length=200, verbose_name="Nombre")
+    fecha_inicio = models.DateField(verbose_name="Fecha inicio")
+    fecha_fin = models.DateField(verbose_name="Fecha fin")
+    descripcion = models.TextField(blank=True, verbose_name="Descripción")
+
+    class Prioridad(models.TextChoices):
+        ALTA = 'ALTA', 'Alta'
+        MEDIA = 'MEDIA', 'Media'
+        BAJA = 'BAJA', 'Baja'
+
+    prioridad = models.CharField(max_length=10, choices=Prioridad.choices,
+                                 default=Prioridad.MEDIA, verbose_name="Prioridad")
+
+    area = models.ForeignKey(
+        'Area',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='eventos',
+        verbose_name='Área'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
+    def __str__(self):
+        return f"{self.nombre} ({self.fecha_inicio} - {self.fecha_fin})"
+
+    class Meta:
+        verbose_name = "Evento"
+        verbose_name_plural = "Eventos"
