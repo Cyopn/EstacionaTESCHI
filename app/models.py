@@ -129,3 +129,55 @@ class Vehiculo(models.Model):
         related_name='vehiculos',
         verbose_name='Usuario'
     )
+
+
+class Sancion(models.Model):
+    motivo = models.TextField(verbose_name="Motivo")
+    fecha = models.DateField(verbose_name="Fecha")
+
+    class Gravedad(models.TextChoices):
+        MODERADA = 'MODERADA', 'Moderada'
+        GRAVE = 'GRAVE', 'Grave'
+        CRITICA = 'CRITICA', 'Crítica'
+
+    gravedad = models.CharField(max_length=10, choices=Gravedad.choices,
+                                default=Gravedad.MODERADA, verbose_name="Gravedad")
+
+    vehiculo = models.ForeignKey(
+        'Vehiculo',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='sanciones',
+        verbose_name='Vehículo'
+    )
+
+    usuario = models.ForeignKey(
+        'Usuario',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='sanciones',
+        verbose_name='Usuario'
+    )
+
+    area = models.ForeignKey(
+        'Area',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='sanciones',
+        verbose_name='Área'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
+    def __str__(self):
+        return f"Sanción {self.id} - {self.get_gravedad_display()} ({self.fecha})"
+
+    class Meta:
+        verbose_name = "Sanción"
+        verbose_name_plural = "Sanciones"

@@ -1,0 +1,623 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <title>Vehiculos - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'success' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-green-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% elif 'error' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-red-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% else %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-gray-700 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+    </nav>
+    <main class="w-full h-[88%]">
+      <img src="{% static 'images/bg-sanction.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />
+      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-auto">
+        <h1 class="text-3xl m-4 text-center">Gestion de sanciones</h1>
+        <div class="w-full px-10 flex items-center">
+          <div class="w-1/2">
+            <div class="mr-10 relative w-[50%]">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+          <div class="w-1/2 flex justify-end">
+            <button id="add-vehicle-btn" class="relative w-[50%] flex cursor-pointer" type="button">
+              <span class="absolute top-0 start-0 p-2 items-center cursor-pointer text-lg"><span class="fi fi-br-plus"></span></span>
+              <label class="p-2 pl-9 pr-5 text-black text-xl font-semibold rounded-xl text-gray-700 rounded-full bg-gray-200/80 cursor-pointer">Agregar sancion</label>
+            </button>
+          </div>
+        </div>
+        <table class="w-[90%] table-auto border-collapse border border-none m-10">
+          <thead>
+            <tr class="text-lg">
+              <th class="border border-none px-4 py-2 text-center">Placa</th>
+              <th class="border border-none px-4 py-2 text-center">Nombre</th>
+              <th class="border border-none px-4 py-2 text-center">Apellido</th>
+              <th class="border border-none px-4 py-2 text-center">Fecha</th>
+              <th class="border border-none px-4 py-2 text-center">Lugar de incidente</th>
+              <th class="border border-none px-4 py-2 text-center">Nivel de gravedad</th>
+              <th class="border border-none px-4 py-2 text-center">Editar</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if sanciones %}
+              {% for sancion in sanciones %}
+                <tr class="hover:bg-gray-100 border-b border-black" data-sancion-id="{{ sancion.id }}" data-placa="{{ sancion.vehiculo.placa|default_if_none:''|escape }}" data-nombre="{{ sancion.usuario.nombre|default_if_none:''|escape }}" data-apellidos="{{ sancion.usuario.apellidos|default_if_none:''|escape }}" data-fecha="{{ sancion.fecha|date:'Y-m-d' }}" data-area="{{ sancion.area.nombre|default_if_none:''|escape }}" data-gravedad="{{ sancion.gravedad|escape }}" data-motivo="{{ sancion.motivo|truncatechars:50|escape }}" data-vehiculo-id="{{ sancion.vehiculo.id|default_if_none:'' }}" data-usuario-id="{{ sancion.usuario.id|default_if_none:'' }}" data-area-id="{{ sancion.area.id|default_if_none:'' }}">
+                  <td class="border border-none px-4 py-2 text-center">{{ sancion.vehiculo.placa }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ sancion.usuario.nombre }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ sancion.usuario.apellidos }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ sancion.fecha }}</td>
+                  <td class="border border-none px-4 py-2 text-center">{{ sancion.area.nombre }}</td>
+                  <td class="border border-none px-4 py-2 text-center">
+                    {% if sancion.gravedad == 'MODERADA' %}
+                      <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#89DD44;">{{ sancion.get_gravedad_display }}</span>
+                    {% elif sancion.gravedad == 'GRAVE' %}
+                      <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#FFDF1E;">{{ sancion.get_gravedad_display }}</span>
+                    {% elif sancion.gravedad == 'CRITICA' %}
+                      <span class="inline-block w-[70%] py-1 rounded-full font-semibold" style="background:#C52700; color:#fff;">{{ sancion.get_gravedad_display }}</span>
+                    {% else %}
+                      {{ sancion.get_gravedad_display }}
+                    {% endif %}
+                  </td>
+                  <td class="border border-none px-4 py-2 text-center">
+                    <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td class="px-4 py-2" colspan="7">No hay sanciones registradas.</td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <div id="sancion-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 id="modal-title" class="text-2xl font-bold mb-4">Editar Sanción</h2>
+        <form id="sancion-form" method="post" action="{% url 'sanction' %}">
+          {% csrf_token %}
+          <input type="hidden" id="modal-action" name="action" value="" />
+          <input type="hidden" id="sancion-id" name="sancion_id" value="" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Motivo</label>
+              <textarea id="modal-motivo" name="motivo" class="mt-1 w-full p-2 rounded bg-gray-200/80"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Fecha</label>
+              <input id="modal-fecha" type="date" name="fecha" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Usuario</label>
+              <select id="modal-usuario" name="usuario" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="">-- Seleccionar --</option>
+                {% for usuario in usuarios %}
+                  <option value="{{ usuario.id }}">{{ usuario.nombre }} {{ usuario.apellidos }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Vehículo</label>
+              <select id="modal-vehiculo" name="vehiculo" class="mt-1 p-2 rounded bg-gray-200/80 w-full" disabled>
+                <option value="">-- Seleccionar --</option>
+                {% for vehiculo in vehiculos %}
+                  <option value="{{ vehiculo.id }}" data-usuario="{{ vehiculo.usuario.id|default_if_none:'' }}">{{ vehiculo.placa }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Área</label>
+              <select id="modal-area" name="area" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="">-- Seleccionar --</option>
+                {% for area in areas %}
+                  <option value="{{ area.id }}">{{ area.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Nivel de gravedad</label>
+              <select id="modal-gravedad" name="gravedad" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="MODERADA">Moderada</option>
+                <option value="GRAVE">Grave</option>
+                <option value="CRITICA">Crítica</option>
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-delete" class="px-6 py-2 bg-red-500/30 border border-red-500 rounded-full cursor-pointer">Eliminar</button>
+            <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <div id="sancion-create-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="create-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 id="create-modal-title" class="text-2xl font-bold mb-4">Crear Sanción</h2>
+        <form id="sancion-create-form" method="post" action="{% url 'sanction' %}">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Motivo</label>
+              <textarea id="create-modal-motivo" name="motivo" class="mt-1 w-full p-2 rounded bg-gray-200/80"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Fecha</label>
+              <input id="create-modal-fecha" type="date" name="fecha" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Nivel de gravedad</label>
+              <select id="create-modal-gravedad" name="gravedad" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="MODERADA">Moderada</option>
+                <option value="GRAVE">Grave</option>
+                <option value="CRITICA">Crítica</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Usuario</label>
+              <select id="create-modal-usuario" name="usuario" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="">-- Seleccionar --</option>
+                {% for usuario in usuarios %}
+                  <option value="{{ usuario.id }}">{{ usuario.nombre }} {{ usuario.apellidos }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Vehículo</label>
+              <select id="create-modal-vehiculo" name="vehiculo" class="mt-1 p-2 rounded bg-gray-200/80 w-full" disabled>
+                <option value="">-- Seleccionar --</option>
+                {% for vehiculo in vehiculos %}
+                  <option value="{{ vehiculo.id }}" data-usuario="{{ vehiculo.usuario.id|default_if_none:'' }}">{{ vehiculo.placa }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Área</label>
+              <select id="create-modal-area" name="area" class="mt-1 p-2 rounded bg-gray-200/80 w-full">
+                <option value="">-- Seleccionar --</option>
+                {% for area in areas %}
+                  <option value="{{ area.id }}">{{ area.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="create-modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="create-modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Crear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <script>
+      ;(function () {
+        const modal = document.getElementById('sancion-modal')
+        const createModal = document.getElementById('sancion-create-modal')
+        const closeBtn = document.getElementById('modal-close')
+        const cancelBtn = document.getElementById('modal-cancel')
+        const deleteBtn = document.getElementById('modal-delete')
+      
+        function getToday() {
+          const d = new Date()
+          const yyyy = d.getFullYear()
+          const mm = String(d.getMonth() + 1).padStart(2, '0')
+          const dd = String(d.getDate()).padStart(2, '0')
+          return `${yyyy}-${mm}-${dd}`
+        }
+      
+        // set max attribute for date inputs to today
+        const todayStr = getToday()
+        const createFechaInput = document.getElementById('create-modal-fecha')
+        const modalFechaInput = document.getElementById('modal-fecha')
+        if (createFechaInput) createFechaInput.max = todayStr
+        if (modalFechaInput) modalFechaInput.max = todayStr
+      
+        function openModal() {
+          modal && modal.classList.remove('hidden')
+          modal && modal.classList.add('flex')
+        }
+      
+        function closeModal() {
+          modal && modal.classList.add('hidden')
+          modal && modal.classList.remove('flex')
+        }
+      
+        function openCreateModal() {
+          if (!createModal) return
+          // clear fields
+          const cm = document.getElementById('create-modal-motivo')
+          const cf = document.getElementById('create-modal-fecha')
+          const cg = document.getElementById('create-modal-gravedad')
+          const cv = document.getElementById('create-modal-vehiculo')
+          const cu = document.getElementById('create-modal-usuario')
+          const ca = document.getElementById('create-modal-area')
+          if (cm) cm.value = ''
+          if (cf) {
+            cf.value = todayStr
+            cf.max = todayStr
+          }
+          if (cg) cg.value = 'MODERADA'
+          if (cv) {
+            cv.value = ''
+            cv.disabled = true
+          }
+          if (cu) cu.value = ''
+          if (ca) ca.value = ''
+          createModal.classList.remove('hidden')
+          createModal.classList.add('flex')
+        }
+      
+        function fillModalFromRow(row) {
+          if (!row) return
+          const sancionIdEl = document.getElementById('sancion-id')
+          const motivoEl = document.getElementById('modal-motivo')
+          const fechaEl = document.getElementById('modal-fecha')
+          const gravedadEl = document.getElementById('modal-gravedad')
+          const vehiculoEl = document.getElementById('modal-vehiculo')
+          const usuarioEl = document.getElementById('modal-usuario')
+          const areaEl = document.getElementById('modal-area')
+      
+          if (sancionIdEl) sancionIdEl.value = row.dataset.sancionId || ''
+          if (motivoEl) motivoEl.value = row.dataset.motivo || ''
+          if (fechaEl) fechaEl.value = row.dataset.fecha || ''
+          if (gravedadEl) gravedadEl.value = row.dataset.gravedad || 'MODERADA'
+          if (usuarioEl) usuarioEl.value = row.dataset.usuarioId || ''
+      
+          // filter vehiculos for this usuario before setting value
+          if (vehiculoEl) {
+            filterVehiculosByUsuario(usuarioEl ? usuarioEl.value : '', vehiculoEl)
+            vehiculoEl.value = row.dataset.vehiculoId || ''
+          }
+      
+          if (areaEl) areaEl.value = row.dataset.areaId || ''
+          const submit = document.getElementById('modal-submit')
+          if (submit) submit.textContent = 'Modificar'
+          if (deleteBtn) deleteBtn.style.display = ''
+        }
+      
+        document.querySelectorAll('.edit-btn').forEach((btn) => {
+          btn.addEventListener('click', function (e) {
+            const row = e.target.closest('tr')
+            if (!row) return
+            // attach sancion id for deletion
+            row.dataset.sancionId = row.dataset.sancionId || row.getAttribute('data-sancion-id') || ''
+            fillModalFromRow(row)
+            openModal()
+          })
+        })
+      
+        const addBtn = document.getElementById('add-vehicle-btn')
+        addBtn && addBtn.addEventListener('click', openCreateModal)
+        closeBtn && closeBtn.addEventListener('click', closeModal)
+        cancelBtn && cancelBtn.addEventListener('click', closeModal)
+      
+        // delete handler for edit modal
+        deleteBtn &&
+          deleteBtn.addEventListener('click', function () {
+            const sancionId = document.getElementById('sancion-id').value || ''
+            if (!sancionId) {
+              showToast('No hay sanción seleccionada para eliminar.', 'error')
+              return
+            }
+            if (!confirm(`Eliminar sanción ${sancionId}? Esta acción no se puede deshacer.`)) return
+            const actionInput = document.getElementById('modal-action')
+            if (actionInput) actionInput.value = 'delete'
+            document.getElementById('sancion-form').submit()
+          })
+      
+        // hook up modal usuario -> vehiculo filtering for edit modal
+        const modalUsuarioSelect = document.getElementById('modal-usuario')
+        const modalVehiculoSelect = document.getElementById('modal-vehiculo')
+        modalUsuarioSelect &&
+          modalUsuarioSelect.addEventListener('change', function () {
+            filterVehiculosByUsuario(this.value, modalVehiculoSelect)
+          })
+      
+        // helper to show toasts for errors/success
+        function showToast(message, type = 'error') {
+          const container = document.getElementById('toast-container')
+          if (!container) return
+          const t = document.createElement('div')
+          t.className = 'toast px-4 py-2 rounded shadow-lg text-white flex items-center gap-3'
+          if (type === 'success') t.classList.add('bg-green-600')
+          else if (type === 'error') t.classList.add('bg-red-600')
+          else t.classList.add('bg-gray-700')
+          t.innerHTML = `<div class="flex-1">${message}</div><button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>`
+          container.appendChild(t)
+          const close = t.querySelector('.toast-close')
+          const timer = setTimeout(() => t.remove(), 4000)
+          if (close)
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              t.remove()
+            })
+        }
+      
+        const searchInput = document.getElementById('search-input')
+        const searchBtn = document.getElementById('search-btn')
+        const tbody = document.querySelector('table tbody')
+        let noResultsRowId = 'no-results-row'
+      
+        function clearNoResults() {
+          const ex = document.getElementById(noResultsRowId)
+          if (ex) ex.remove()
+        }
+      
+        function filterTable(term) {
+          term = (term || '').toLowerCase().trim()
+          clearNoResults()
+          const rows = Array.from(tbody.querySelectorAll('tr'))
+          let visible = 0
+          rows.forEach((row) => {
+            const fields = [row.dataset.placa || '', row.dataset.nombre || '', row.dataset.apellidos || '', row.dataset.fecha || '', row.dataset.area || '', row.dataset.gravedad || '']
+            const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
+            if (matches) {
+              row.style.display = ''
+              visible++
+            } else {
+              row.style.display = 'none'
+            }
+          })
+          if (visible === 0) {
+            const tr = document.createElement('tr')
+            tr.id = noResultsRowId
+            tr.innerHTML = `<td class="px-4 py-2 text-center" colspan="7">No se encontraron resultados.</td>`
+            tbody.appendChild(tr)
+          }
+        }
+      
+        function debounce(fn, wait) {
+          let t
+          return function (...args) {
+            clearTimeout(t)
+            t = setTimeout(() => fn.apply(this, args), wait)
+          }
+        }
+      
+        const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
+        searchInput && searchInput.addEventListener('input', debouncedFilter)
+        searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      
+        // sancion form validation (basic)
+        const sancionForm = document.getElementById('sancion-form')
+        sancionForm &&
+          sancionForm.addEventListener('submit', function (e) {
+            const action = (document.getElementById('modal-action') && document.getElementById('modal-action').value) || ''
+            if (action === 'delete') return
+            const motivoEl = document.getElementById('modal-motivo')
+            const fechaEl = document.getElementById('modal-fecha')
+            const usuarioEl = document.getElementById('modal-usuario')
+            const vehiculoEl = document.getElementById('modal-vehiculo')
+            const areaEl = document.getElementById('modal-area')
+            const gravedadEl = document.getElementById('modal-gravedad')
+      
+            const motivo = ((motivoEl && motivoEl.value) || '').trim()
+            if (!motivo) {
+              showToast('El motivo es obligatorio.', 'error')
+              e.preventDefault()
+              markInvalid(motivoEl)
+              return
+            }
+      
+            if (fechaEl) {
+              const val = fechaEl.value || ''
+              if (!val) {
+                showToast('La fecha es obligatoria.', 'error')
+                e.preventDefault()
+                markInvalid(fechaEl)
+                return
+              }
+              if (val > todayStr) {
+                showToast('La fecha no puede ser futura.', 'error')
+                e.preventDefault()
+                markInvalid(fechaEl)
+                return
+              }
+            }
+      
+            if (usuarioEl && !usuarioEl.value) {
+              showToast('Seleccione un usuario.', 'error')
+              e.preventDefault()
+              markInvalid(usuarioEl)
+              return
+            }
+      
+            if (vehiculoEl && !vehiculoEl.value) {
+              showToast('Seleccione un vehículo.', 'error')
+              e.preventDefault()
+              markInvalid(vehiculoEl)
+              return
+            }
+      
+            if (areaEl && !areaEl.value) {
+              showToast('Seleccione un área.', 'error')
+              e.preventDefault()
+              markInvalid(areaEl)
+              return
+            }
+      
+            if (gravedadEl && !gravedadEl.value) {
+              showToast('Seleccione el nivel de gravedad.', 'error')
+              e.preventDefault()
+              markInvalid(gravedadEl)
+              return
+            }
+          })
+      
+        const createClose = document.getElementById('create-modal-close')
+        const createCancel = document.getElementById('create-modal-cancel')
+        const createForm = document.getElementById('sancion-create-form')
+        createClose && createClose.addEventListener('click', () => createModal && createModal.classList.add('hidden'))
+        createCancel && createCancel.addEventListener('click', () => createModal && createModal.classList.add('hidden'))
+        createModal &&
+          createModal.addEventListener('click', function (e) {
+            if (e.target === createModal) createModal.classList.add('hidden')
+          })
+        createForm &&
+          createForm.addEventListener('submit', function (e) {
+            const motivoEl = document.getElementById('create-modal-motivo')
+            const fechaEl = document.getElementById('create-modal-fecha')
+            const usuarioEl = document.getElementById('create-modal-usuario')
+            const vehiculoEl = document.getElementById('create-modal-vehiculo')
+            const areaEl = document.getElementById('create-modal-area')
+            const gravedadEl = document.getElementById('create-modal-gravedad')
+      
+            const motivo = ((motivoEl && motivoEl.value) || '').trim()
+            if (!motivo) {
+              showToast('El motivo es obligatorio.', 'error')
+              e.preventDefault()
+              markInvalid(motivoEl)
+              return
+            }
+      
+            // fecha validation: required and not in future
+            if (fechaEl) {
+              const val = fechaEl.value || ''
+              if (!val) {
+                showToast('La fecha es obligatoria.', 'error')
+                e.preventDefault()
+                markInvalid(fechaEl)
+                return
+              }
+              if (val > todayStr) {
+                showToast('La fecha no puede ser futura.', 'error')
+                e.preventDefault()
+                markInvalid(fechaEl)
+                return
+              }
+            }
+      
+            if (usuarioEl && !usuarioEl.value) {
+              showToast('Seleccione un usuario.', 'error')
+              e.preventDefault()
+              markInvalid(usuarioEl)
+              return
+            }
+      
+            if (vehiculoEl && !vehiculoEl.value) {
+              showToast('Seleccione un vehículo.', 'error')
+              e.preventDefault()
+              markInvalid(vehiculoEl)
+              return
+            }
+      
+            if (areaEl && !areaEl.value) {
+              showToast('Seleccione un área.', 'error')
+              e.preventDefault()
+              markInvalid(areaEl)
+              return
+            }
+      
+            if (gravedadEl && !gravedadEl.value) {
+              showToast('Seleccione el nivel de gravedad.', 'error')
+              e.preventDefault()
+              markInvalid(gravedadEl)
+              return
+            }
+          })
+      
+        // Filtrar vehículos por usuario en modal de creación
+        const createUsuarioSelect = document.getElementById('create-modal-usuario')
+        const createVehiculoSelect = document.getElementById('create-modal-vehiculo')
+      
+        function filterVehiculosByUsuario(usuarioId, vehSelect) {
+          if (!vehSelect) return
+          let firstVisible = ''
+          Array.from(vehSelect.options).forEach((opt) => {
+            const owner = opt.dataset.usuario || ''
+            if (!usuarioId) {
+              opt.style.display = ''
+              opt.disabled = false
+              if (!firstVisible && opt.value) firstVisible = opt.value
+            } else {
+              if (String(owner) === String(usuarioId)) {
+                opt.style.display = ''
+                opt.disabled = false
+                if (!firstVisible && opt.value) firstVisible = opt.value
+              } else if (opt.value === '') {
+                // always show the empty placeholder
+                opt.style.display = ''
+                opt.disabled = false
+              } else {
+                opt.style.display = 'none'
+                opt.disabled = true
+              }
+            }
+          })
+          // enable or disable the select element itself depending on usuario selection
+          if (!usuarioId) {
+            vehSelect.disabled = true
+            vehSelect.value = ''
+          } else {
+            vehSelect.disabled = false
+          }
+          // if current value is disabled or empty, set to first visible
+          const cur = vehSelect.value || ''
+          const curOpt = Array.from(vehSelect.options).find((o) => o.value === cur)
+          if (!curOpt || curOpt.disabled) {
+            vehSelect.value = firstVisible || ''
+          }
+        }
+      
+        createUsuarioSelect &&
+          createUsuarioSelect.addEventListener('change', function () {
+            filterVehiculosByUsuario(this.value, createVehiculoSelect)
+          })
+        // inicializar filtro al cargar
+        createUsuarioSelect && filterVehiculosByUsuario(createUsuarioSelect.value, createVehiculoSelect)
+      
+        // Toast auto-hide and close handling
+        const toasts = document.querySelectorAll('#toast-container .toast')
+        toasts.forEach((t) => {
+          const close = t.querySelector('.toast-close')
+          const hide = () => t.remove()
+          // auto hide after 4s
+          const timer = setTimeout(hide, 4000)
+          close &&
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              hide()
+            })
+        })
+      })()
+    </script>
+  </body>
+</html>

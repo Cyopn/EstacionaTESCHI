@@ -13,7 +13,6 @@
     <title>Usuarios - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
-    <!-- Toast container -->
     <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
       {% if messages %}
         {% for message in messages %}
@@ -119,7 +118,6 @@
               <label class="block text-sm font-medium">Teléfono</label>
               <input id="modal-telefono" name="telefono" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
             </div>
-            <!-- No hay rol/puesto para Usuario; campos anteriores mantienen estructura -->
           </div>
           <div class="mt-6 flex justify-end gap-3">
             <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
@@ -209,12 +207,10 @@
         searchInput && searchInput.addEventListener('input', debouncedFilter)
         searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
       
-        // Toast auto-hide and close handling
         const toasts = document.querySelectorAll('#toast-container .toast')
         toasts.forEach((t) => {
           const close = t.querySelector('.toast-close')
           const hide = () => t.remove()
-          // auto hide after 4s
           const timer = setTimeout(hide, 4000)
           close &&
             close.addEventListener('click', () => {

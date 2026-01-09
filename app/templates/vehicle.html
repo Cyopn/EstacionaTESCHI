@@ -13,7 +13,6 @@
     <title>Vehiculos - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
-    <!-- Toast container -->
     <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
       {% if messages %}
         {% for message in messages %}
@@ -147,7 +146,6 @@
       </div>
     </div>
 
-    <!-- Create Vehicle Modal -->
     <div id="vehicle-create-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
       <div class="bg-white rounded-lg w-2/3 p-8 relative">
         <button id="create-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
@@ -217,7 +215,6 @@
         function openCreateModal() {
           const createModalElem = document.getElementById('vehicle-create-modal')
           if (!createModalElem) {
-            // fallback: reuse edit modal
             if (document.getElementById('modal-title')) document.getElementById('modal-title').textContent = 'Crear Vehículo'
             document.getElementById('modal-placa') && (document.getElementById('modal-placa').value = '')
             document.getElementById('modal-placa') && (document.getElementById('modal-placa').readOnly = false)
@@ -232,7 +229,6 @@
             openModal()
             return
           }
-          // clear create modal fields
           const cPlaca = document.getElementById('create-modal-placa')
           cPlaca && (cPlaca.value = '')
           const cMarca = document.getElementById('create-modal-marca')
@@ -334,7 +330,6 @@
         searchInput && searchInput.addEventListener('input', debouncedFilter)
         searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
       
-        // Client-side validation for placa on submit (except delete action)
         const vehicleForm = document.getElementById('vehicle-form')
         vehicleForm &&
           vehicleForm.addEventListener('submit', function (e) {
@@ -357,7 +352,6 @@
             placaInput.value = placa.toUpperCase()
           })
       
-        // Create modal handlers and validation
         const createModal = document.getElementById('vehicle-create-modal')
         const createClose = document.getElementById('create-modal-close')
         const createCancel = document.getElementById('create-modal-cancel')
@@ -387,12 +381,10 @@
             placaInput.value = placa.toUpperCase()
           })
       
-        // Toast auto-hide and close handling
         const toasts = document.querySelectorAll('#toast-container .toast')
         toasts.forEach((t) => {
           const close = t.querySelector('.toast-close')
           const hide = () => t.remove()
-          // auto hide after 4s
           const timer = setTimeout(hide, 4000)
           close &&
             close.addEventListener('click', () => {
