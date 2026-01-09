@@ -216,3 +216,46 @@ class Evento(models.Model):
     class Meta:
         verbose_name = "Evento"
         verbose_name_plural = "Eventos"
+
+
+class Acceso(models.Model):
+    fecha = models.DateTimeField(verbose_name="Fecha")
+
+    class Tipo(models.TextChoices):
+        ENTRADA = 'ENTRADA', 'Entrada'
+        SALIDA = 'SALIDA', 'Salida'
+
+    tipo = models.CharField(max_length=10, choices=Tipo.choices,
+                            default=Tipo.ENTRADA, verbose_name="Tipo")
+
+    usuario = models.ForeignKey(
+        'Usuario',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='accesos',
+        verbose_name='Usuario'
+    )
+
+    vehiculo = models.ForeignKey(
+        'Vehiculo',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='accesos',
+        verbose_name='Vehículo'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
+    def __str__(self):
+        user_repr = str(self.usuario) if self.usuario else 'Sin usuario'
+        vehicle_repr = str(self.vehiculo) if self.vehiculo else 'Sin vehículo'
+        return f"{self.get_tipo_display()} - {user_repr} - {vehicle_repr} ({self.fecha})"
+
+    class Meta:
+        verbose_name = "Acceso"
+        verbose_name_plural = "Accesos"

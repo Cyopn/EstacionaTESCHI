@@ -1,0 +1,135 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <style>
+      .table-scroll-wrapper thead th {
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 10;
+      }
+      .table-scroll-wrapper {
+        overflow: auto;
+      }
+    </style>
+    <title>Vehiculos - EstacionaTESCHI</title>
+  </head>
+  <body class="w-screen h-screen overflow-hidden">
+    <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
+      <a class="start-0 flex items-center" href="/index/">
+        <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
+        <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
+      </a>
+      <div class="relative flex items-center gap-6">
+        <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+      </div>
+    </nav>
+    <main class="w-full h-[88%]">
+      <img src="{% static 'images/bg-vehicle.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />
+      <div class="absolute w-[80%] h-[68%] top-[25%] start-1/2 -translate-x-1/2 bg-white rounded-xl inset-shadow-sm inset-shadow-gray-400 overflow-hidden">
+        <h1 class="text-3xl m-4 text-center font-bold">Registro de acceso</h1>
+        <div class="w-full px-10 flex items-center">
+          <div class="w-1/2">
+            <div class="mr-10 relative w-[50%]">
+              <input id="search-input" class="p-2 w-full text-gray-700 rounded-xl text-gray-700 rounded-full bg-gray-200/80" placeholder="Buscar" />
+              <button id="search-btn" type="button" class="absolute top-0 end-0 p-2 items-center cursor-pointer"><span class="fi fi-br-search text-xl"></span></button>
+            </div>
+          </div>
+          <div class="w-1/2 flex justify-end"></div>
+        </div>
+        <div class="table-scroll-wrapper w-[90%] m-10 overflow-auto" style="max-height:46vh;">
+          <table class="w-full table-auto border-collapse border border-none">
+            <thead>
+              <tr class="text-lg">
+                <th class="border border-none px-4 py-2 text-center">N. acceso</th>
+                <th class="border border-none px-4 py-2 text-center">Fecha</th>
+                <th class="border border-none px-4 py-2 text-center">Tipo</th>
+                <th class="border border-none px-4 py-2 text-center">Nombre</th>
+                <th class="border border-none px-4 py-2 text-center">Placa</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if accesos %}
+                {% for acceso in accesos %}
+                  <tr class="hover:bg-gray-100 border-b border-black" data-acceso-id="{{ acceso.id }}" data-fecha="{{ acceso.fecha|date:'d-m-Y H:i' }}" data-tipo="{{ acceso.tipo|escape }}" data-usuario="{{ acceso.usuario.nombre|default_if_none:''|escape }}" data-placa="{{ acceso.vehiculo.placa|default_if_none:''|escape }}">
+                    <td class="border border-none px-4 py-2 text-center">{{ acceso.id }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ acceso.fecha|date:'d-m-Y H:i' }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ acceso.get_tipo_display }}</td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      {% if acceso.usuario %}{{ acceso.usuario.nombre }}{% endif %}
+                    </td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      {% if acceso.vehiculo %}{{ acceso.vehiculo.placa }}{% endif %}
+                    </td>
+                  </tr>
+                {% endfor %}
+              {% else %}
+                <tr>
+                  <td class="px-4 py-2" colspan="5">No hay accesos registrados.</td>
+                </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      ;(function () {
+        const searchInput = document.getElementById('search-input')
+        const searchBtn = document.getElementById('search-btn')
+        const tbody = document.querySelector('table tbody')
+        let noResultsRowId = 'no-results-row'
+      
+        function clearNoResults() {
+          const ex = document.getElementById(noResultsRowId)
+          if (ex) ex.remove()
+        }
+      
+        function filterTable(term) {
+          term = (term || '').toLowerCase().trim()
+          clearNoResults()
+          const rows = Array.from(tbody.querySelectorAll('tr'))
+          let visible = 0
+          rows.forEach((row) => {
+            const fields = [row.dataset.accesoId || '', row.dataset.fecha || '', row.dataset.tipo || '', row.dataset.usuario || '', row.dataset.placa || '']
+            const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
+            if (matches) {
+              row.style.display = ''
+              visible++
+            } else {
+              row.style.display = 'none'
+            }
+          })
+          if (visible === 0) {
+            const tr = document.createElement('tr')
+            tr.id = noResultsRowId
+            tr.innerHTML = `<td class="px-4 py-2 text-center" colspan="5">No se encontraron resultados.</td>`
+            tbody.appendChild(tr)
+          }
+        }
+      
+        function debounce(fn, wait) {
+          let t
+          return function (...args) {
+            clearTimeout(t)
+            t = setTimeout(() => fn.apply(this, args), wait)
+          }
+        }
+      
+        const debouncedFilter = debounce((e) => filterTable(e.target.value), 250)
+        searchInput && searchInput.addEventListener('input', debouncedFilter)
+        searchBtn && searchBtn.addEventListener('click', () => filterTable(searchInput.value))
+      })()
+    </script>
+  </body>
+</html>

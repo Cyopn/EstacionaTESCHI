@@ -18,7 +18,6 @@ class VehicleView(View):
             messages.error(request, 'Placa no proporcionada.')
             return redirect(request.path)
 
-        # Normalizar y validar formato de placa
         placa = placa.strip().upper()
         placa_re = re.compile(r'^[A-Z0-9-]{3,10}$')
         if not placa_re.match(placa):
@@ -49,7 +48,6 @@ class VehicleView(View):
                 usuario_obj = None
 
         if action == 'create':
-            # Crear solo si no existe placa
             if Vehiculo.objects.filter(placa=placa).exists():
                 messages.error(request, 'Ya existe un vehículo con esa placa.')
                 return redirect(request.path)
@@ -64,7 +62,6 @@ class VehicleView(View):
             messages.success(request, 'Vehículo creado correctamente.')
             return redirect(request.path)
 
-        # default: update existing vehicle
         try:
             vehiculo = Vehiculo.objects.get(placa=placa)
             vehiculo.marca = marca or vehiculo.marca

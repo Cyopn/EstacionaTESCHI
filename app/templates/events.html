@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-straight/css/uicons-solid-straight.css" />
     <style>
       .table-scroll-wrapper thead th {
         position: sticky;
@@ -20,7 +21,6 @@
       .table-scroll-wrapper {
         overflow: auto;
       }
-      /* Make tbody scrollable while keeping thead sticky */
       .table-scroll-wrapper table {
         width: 100%;
         border-collapse: collapse;
@@ -72,8 +72,10 @@
       <a class="start-0 flex items-center" href="/index/">
         <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
         <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
-      </a>
-      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+      </a><div class="relative flex items-center gap-6">
+        <a href="/access/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-ss-time-past"></span></a>
+        <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+      </div>
     </nav>
     <main class="w-full h-[88%]">
       <img src="{% static 'images/bg-vehicle.png' %}" alt="bg" border="0" class="absolute z-0 h-[40%] w-full top-[12%] object-cover" />

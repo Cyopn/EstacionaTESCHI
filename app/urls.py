@@ -11,6 +11,7 @@ from app.user.user_view import UserView
 from app.vehicle.vehicle_view import VehicleView
 from app.sanction.sanction_view import SanctionView
 from app.events.events_view import EventsView
+from app.access.access_view import AccessView
 
 urlpatterns = [
     path('', RootView.as_view(), name='home'),
@@ -25,4 +26,5 @@ urlpatterns = [
     path('vehicle/', VehicleView.as_view(), name='vehicle'),
     path('sanction/', SanctionView.as_view(), name='sanction'),
     path('events/', EventsView.as_view(), name='events'),
+    path('access/', AccessView.as_view(), name='access'),
 ]

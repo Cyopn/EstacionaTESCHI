@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-rounded/css/uicons-solid-rounded.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-straight/css/uicons-solid-straight.css" />
     <title>Acceso - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
@@ -16,8 +17,10 @@
       <a class="start-0 flex items-center" href="/index/">
         <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
         <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
-      </a>
-      <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+      </a><div class="relative flex items-center gap-6">
+        <a href="/access/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-ss-time-past"></span></a>
+        <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+      </div>
     </nav>
     <div>
       <div class="absolute w-full h-full flex">
