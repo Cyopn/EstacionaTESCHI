@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-straight/css/uicons-solid-straight.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
     <title>Acceso - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
@@ -18,6 +19,7 @@
         <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
         <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
       </a><div class="relative flex items-center gap-6">
+        <button id="btnCameraIp" class="end-0 text-5xl cursor-pointer" title="Configurar IP cámara"><span class="fi fi-br-monitor-sun"></span></button>
         <a href="/access/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-ss-time-past"></span></a>
         <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
       </div>
@@ -38,37 +40,35 @@
           <div class="flex flex-col justify-center items-center h-[65%] rounded-lg shadow-xl m-3 mx-5 border-2 border-gray-400/80 py-5">
             <div class="w-full p-5 text-xl flex gap-5">
               <span class="p-1 pr-2">Placa</span>
-              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="placa"></label>
+              <label id="detected-placa" class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="placa"></label>
             </div>
             <div class="w-full p-5 text-xl flex gap-5">
               <span class="p-1 pr-2">Modelo</span>
-              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="modelo"></label>
+              <label id="detected-modelo" class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="modelo"></label>
             </div>
             <div class="w-full p-5 text-xl flex gap-5">
               <span class="p-1 pr-2">Cajon asignado</span>
-              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="cajon"></label>
+              <label id="detected-cajon" class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="cajon"></label>
             </div>
             <div class="w-full p-5 text-xl flex gap-5">
               <span class="p-1 pr-2">Propietario</span>
-              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="propietario"></label>
+              <label id="detected-propietario" class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="propietario"></label>
             </div>
             <div class="w-full p-5 text-xl flex gap-5">
               <span class="p-1 pr-2">Matricula</span>
-              <label class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="matricula"></label>
+              <label id="detected-matricula" class="bg-[#D9D9D9B0] p-1 rounded-lg flex-1 text-center" for="matricula"></label>
             </div>
           </div>
         </div>
         <div class="w-3/4 h-[75%] flex flex-col">
-          <div class="w-[74%] h-4/5 rounded-lg shadow-xl m-2 border-2 border-red-500">
-            <video class="w-full h-full rounded-lg" autoplay muted>
-              <source src="{% static 'videos/camara.mp4' %}" type="video/mp4" />Your browser does not support the video tag.
-            </video>
+          <div class="w-[74%] h-4/5 rounded-lg shadow-xl m-2 border-2 border-red-500 flex items-center justify-center bg-black/10">
+            <img id="cameraStream" alt="Stream cámara" class="w-full h-full object-cover rounded-lg" src="" />
           </div>
           <div class="w-[74%] h-1/5 rounded-lg shadow-xl m-2 border-2 border-gray-400/80">
             <div class="w-full h-full flex items-center flex flex-col">
-              <span class="text-xl">Evento: <label for="event"></label></span>
-              <div class="w-[90%] text-2xl text-center m-3 bg-[#45FF6D] p-5 rounded-xl">
-                <label for="entry"></label>
+              <span class="text-xl">Evento: <label id="event-label" for="event"></label></span>
+              <div id="entry-box" class="w-[90%] text-2xl text-center m-3 bg-gray-300 p-5 rounded-xl">
+                <label id="entry-label" for="entry">Sin placa detectada</label>
               </div>
             </div>
           </div>
@@ -76,4 +76,295 @@
       </div>
     </div>
   </body>
+  <!-- Modal para configurar IP de la cámara (estilo consistente con otros templates) -->
+  <div id="camera-create-modal" class="fixed inset-0 hidden flex items-center justify-center bg-black/50 z-50">
+    <div class="bg-white rounded-lg w-2/3 p-8 relative">
+      <button id="create-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+      <h2 class="text-2xl font-bold mb-4">Configurar IP de la cámara</h2>
+      <form id="create-modal-form" class="grid grid-cols-1 md:grid-cols-1 gap-4">
+        <input type="hidden" />
+        <div>
+          <label class="block text-sm font-medium">Dirección IP</label>
+          <input id="create-modal-ip" type="text" placeholder="Ej: http://192.168.1.10/video" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
+          <div class="text-sm text-red-600 hidden mt-1" id="create-modal-error">IP inválida. Usa formato: 192.168.1.10</div>
+        </div>
+        <div class="mt-4 flex justify-end gap-3">
+          <button type="button" id="create-modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+          <button id="create-modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    ;(function () {
+      const modal = document.getElementById('camera-create-modal')
+      const btn = document.getElementById('btnCameraIp')
+      const closeBtn = document.getElementById('create-modal-close')
+      const cancelBtn = document.getElementById('create-modal-cancel')
+      const form = document.getElementById('create-modal-form')
+      const input = document.getElementById('create-modal-ip')
+      const error = document.getElementById('create-modal-error')
+      const STORAGE_KEY = 'camera_ip'
+    
+      function openModal() {
+        // cargar valor guardado
+        const saved = localStorage.getItem(STORAGE_KEY) || ''
+        input.value = saved
+        error.classList.add('hidden')
+        modal.classList.remove('hidden')
+        modal.classList.add('flex')
+        input.focus()
+      }
+    
+      function closeModal() {
+        modal.classList.add('hidden')
+        modal.classList.remove('flex')
+      }
+    
+      // Valida IP o URL simple (acepta IPv4 o URL que empiece con http:// o https://)
+      function validIp(v) {
+        if (!v) return false
+        v = v.trim()
+        if (/^https?:\/\//i.test(v)) return true
+        const parts = v.split('.')
+        if (parts.length !== 4) return false
+        return parts.every((p) => {
+          if (!/^[0-9]+$/.test(p)) return false
+          const n = Number(p)
+          return n >= 0 && n <= 255
+        })
+      }
+    
+      function setCameraStream() {
+        const img = document.getElementById('cameraStream')
+        const stored = localStorage.getItem(STORAGE_KEY)
+        if (!stored || !img) {
+          if (img) img.src = ''
+          return
+        }
+        const url = `/detection/stream_by_ip/?ip=${encodeURIComponent(stored)}`
+        img.src = url
+      }
+    
+      btn?.addEventListener('click', openModal)
+      closeBtn?.addEventListener('click', closeModal)
+      cancelBtn?.addEventListener('click', closeModal)
+      modal?.addEventListener('click', (e) => {
+        if (e.target === modal) closeModal()
+      })
+    
+      form?.addEventListener('submit', function (e) {
+        e.preventDefault()
+        const val = input.value.trim()
+        if (!validIp(val)) {
+          error.classList.remove('hidden')
+          return
+        }
+        localStorage.setItem(STORAGE_KEY, val)
+        setCameraStream()
+        closeModal()
+      })
+    
+      // Inicializar stream al cargar la página
+      document.addEventListener('DOMContentLoaded', function () {
+        setCameraStream()
+    
+        // Iniciar sondeo de textos detectados y autocompletar datos del vehículo
+        ;(function startPolling() {
+          const STORAGE_KEY = 'camera_ip'
+          const plateRegex = /^[A-Z]{1,4}-[A-Z0-9]{1,6}$/
+          let lastQueried = null
+          const COOLDOWN_MS = 5000 // mismo tiempo que la pausa tras autorización
+          let lastLookupTs = 0
+          let pauseUntil = 0 // timestamp hasta el que se pausa detección tras acceso autorizado
+          let failCount = 0
+          const entryBox = document.getElementById('entry-box')
+          const entryLabel = document.getElementById('entry-label')
+          const eventLabel = document.getElementById('event-label')
+          const DEFAULT_BG = '#D1D5DB' // gris claro
+          const DEFAULT_TEXT = 'Sin placa detectada'
+          if (entryBox) {
+            entryBox.style.backgroundColor = DEFAULT_BG
+            entryBox.style.color = ''
+            entryLabel.innerText = DEFAULT_TEXT
+          }
+    
+          async function logAccess(placa) {
+            try {
+              await fetch('/detection/access_log/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ placa })
+              })
+            } catch (err) {
+              console.warn('log access failed', err)
+            }
+          }
+    
+          function normalizePlate(text) {
+            const clean = text.toUpperCase().replace(/[^A-Z0-9-]/g, '')
+            const parts = clean.split('-').filter(Boolean)
+            if (parts.length >= 2) {
+              const prefix = parts[0]
+              const suffix = parts.slice(1).join('')
+              return `${prefix}-${suffix}`
+            }
+            const m = clean.match(/^([A-Z]{1,4})([A-Z0-9]{1,6})$/)
+            if (m) {
+              return `${m[1]}-${m[2]}`
+            }
+            return clean
+          }
+    
+          async function check() {
+            try {
+              console.log('[poll] check start')
+              const ip = localStorage.getItem(STORAGE_KEY)
+              if (!ip) return
+              // si estamos en pausa por acceso autorizado, no procesar
+              const nowGlobal = Date.now()
+              if (nowGlobal < pauseUntil) {
+                return
+              }
+              let res
+              try {
+                res = await fetch(`/detection/last_text/?ip=${encodeURIComponent(ip)}`)
+              } catch (errFetch) {
+                failCount += 1
+                console.warn('[poll] fetch last_text failed', errFetch)
+                if (failCount >= 3 && entryLabel) {
+                  entryLabel.innerText = 'Sin conexión con detección'
+                  if (eventLabel) eventLabel.innerText = 'Servicio no disponible'
+                }
+                return
+              }
+              if (!res.ok) {
+                failCount += 1
+                console.warn('[poll] last_text HTTP error', res.status)
+                if (failCount >= 3 && entryLabel) {
+                  entryLabel.innerText = 'Sin conexión con detección'
+                  if (eventLabel) eventLabel.innerText = 'Servicio no disponible'
+                }
+                return
+              }
+              failCount = 0
+              const payload = await res.json()
+              const data = Array.isArray(payload) ? payload : payload.texts || []
+              if (!Array.isArray(data)) return
+    
+              for (const item of data) {
+                const txt = (item && (item.text || item[0] || item)) || ''
+                const norm = normalizePlate(String(txt))
+                if (!norm) continue
+                console.log('OCR detected:', norm, 'raw:', txt, 'item:', item)
+                if (!plateRegex.test(norm)) continue
+                if (lastQueried && lastQueried === norm) {
+                  console.log('[poll] same plate, skip')
+                  return
+                }
+                // respetar cooldown entre búsquedas para reducir carga
+                const now = Date.now()
+                if (now - lastLookupTs < COOLDOWN_MS) {
+                  console.log('[poll] cooldown, skip')
+                  continue
+                }
+                lastQueried = norm
+                lastLookupTs = now
+    
+                // consultar vehículo por placa
+                try {
+                  console.log('[poll] lookup placa', norm)
+                  const vres = await fetch(`/detection/vehiculo_lookup/?placa=${encodeURIComponent(norm)}`)
+                  if (!vres.ok) {
+                    // aun así mostrar la placa detectada
+                    document.getElementById('detected-placa').innerText = norm
+                    console.log('[poll] veh lookup http error', vres.status)
+                    continue
+                  }
+                  const vjson = await vres.json()
+                  console.log('[poll] lookup result', vjson)
+                  document.getElementById('detected-placa').innerText = norm
+                  // interpretar correctamente la respuesta: backend devuelve {found: true|false, ...}
+                  const found = vjson && (vjson.found === true || vjson.found === 'true')
+                  const veh = found ? vjson : null
+                  if (!found) {
+                    // Placa no encontrada -> mostrar 'NO AUTORIZADO' en el div principal
+                    if (entryBox) {
+                      entryBox.style.backgroundColor = '#FF4B4B'
+                      entryBox.style.color = '#FFFFFF'
+                    }
+                    if (entryLabel) entryLabel.innerText = `${norm} - NO AUTORIZADO`
+                    if (eventLabel) {
+                      eventLabel.innerText = 'Acceso no autorizado'
+                      console.log('[poll] set event-label NO AUTORIZADO')
+                    }
+                    // limpiar campos secundarios
+                    const modeloEl = document.getElementById('detected-modelo')
+                    const propEl = document.getElementById('detected-propietario')
+                    const matEl = document.getElementById('detected-matricula')
+                    if (modeloEl) modeloEl.innerText = ''
+                    if (propEl) propEl.innerText = ''
+                    if (matEl) matEl.innerText = ''
+                    return
+                  }
+                  // Si se encuentra el vehículo, restaurar estado del div
+                  if (entryBox) {
+                    entryBox.style.backgroundColor = '#45FF6D'
+                    entryBox.style.color = ''
+                  }
+                  if (entryLabel) entryLabel.innerText = `${norm} - AUTORIZADO`
+                  if (eventLabel) {
+                    eventLabel.innerText = `Acceso autorizado`
+                    console.log('[poll] set event-label AUTORIZADO')
+                  }
+                  const marca = veh.marca || ''
+                  const modelo = veh.modelo || ''
+                  const propietario = (veh.usuario && (veh.usuario.nombre || veh.usuario.full_name || veh.usuario.username)) || ''
+                  const matricula = veh.color || ''
+                  document.getElementById('detected-modelo').innerText = (marca + ' ' + modelo).trim()
+                  document.getElementById('detected-propietario').innerText = propietario
+                  document.getElementById('detected-matricula').innerText = matricula
+                  // cajón asignado no disponible en esta consulta; dejar vacío o limpiar
+    
+                  logAccess(norm)
+    
+                  // Pausar detección 5s y luego resetear UI
+                  pauseUntil = Date.now() + 5000
+                  // limpiar buffer de textos en backend para evitar reautorizaciones con texto viejo
+                  fetch(`/detection/last_text/?ip=${encodeURIComponent(ip)}&clear=1`).catch(() => {})
+                  setTimeout(() => {
+                    pauseUntil = 0
+                    lastQueried = null
+                    if (entryBox) {
+                      entryBox.style.backgroundColor = DEFAULT_BG
+                      entryBox.style.color = ''
+                    }
+                    if (entryLabel) entryLabel.innerText = DEFAULT_TEXT
+                    if (eventLabel) eventLabel.innerText = ''
+                    const placaEl = document.getElementById('detected-placa')
+                    const modeloEl = document.getElementById('detected-modelo')
+                    const propEl = document.getElementById('detected-propietario')
+                    const matEl = document.getElementById('detected-matricula')
+                    if (placaEl) placaEl.innerText = ''
+                    if (modeloEl) modeloEl.innerText = ''
+                    if (propEl) propEl.innerText = ''
+                    if (matEl) matEl.innerText = ''
+                    console.log('[poll] resume after pause, UI reset')
+                  }, 5000)
+                } catch (err) {
+                  console.error('veh lookup error', err)
+                }
+              }
+            } catch (err) {
+              console.error('polling error', err)
+            }
+          }
+    
+          // ejecutar cada 800ms
+          setInterval(check, 800)
+        })()
+      })
+    })()
+  </script>
 </html>

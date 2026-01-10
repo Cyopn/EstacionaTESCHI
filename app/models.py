@@ -130,6 +130,15 @@ class Usuario(models.Model):
         max_length=30, blank=True, null=True, verbose_name="Teléfono")
     contraseña = models.CharField(max_length=128, verbose_name="Contraseña")
 
+    area = models.ForeignKey(
+        'Area',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='usuarios',
+        verbose_name='Área'
+    )
+
     fecha_creacion = models.DateTimeField(
         auto_now_add=True, verbose_name="Fecha de creación")
     fecha_modificacion = models.DateTimeField(
