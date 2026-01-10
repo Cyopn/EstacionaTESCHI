@@ -9,10 +9,33 @@
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-chubby/css/uicons-solid-chubby.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-straight/css/uicons-bold-straight.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-bold-rounded/css/uicons-bold-rounded.css" />
+    <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-regular-rounded/css/uicons-regular-rounded.css" />
     <link rel="stylesheet" href="https://cdn-uicons.flaticon.com/3.0.0/uicons-solid-straight/css/uicons-solid-straight.css" />
     <title>Acceso - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
+    <div id="toast-container" class="fixed top-4 end-4 z-50 flex flex-col gap-2">
+      {% if messages %}
+        {% for message in messages %}
+          {% if 'success' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-green-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% elif 'error' in message.tags %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-red-600 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% else %}
+            <div class="toast px-4 py-2 rounded shadow-lg text-white bg-gray-700 flex items-center gap-3" role="status">
+              <div class="flex-1">{{ message }}</div>
+              <button class="toast-close ml-2 text-white opacity-90 cursor-pointer">&times;</button>
+            </div>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
     <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full">
       <a class="start-0 flex items-center" href="/index/">
         <img src="{% static 'images/logo.png' %}" alt="" border="0" class="w-20 h-20 inline-block mr-2" />
@@ -29,6 +52,75 @@
         <div class="absolute h-[50vh] w-3/25 bg-[#053172] rounded-t-full start-0 bottom-0 z-2"></div>
       </div>
     </div>
+
+    <div id="create-area-modal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="create-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Crear Área</h2>
+        {% if error %}
+          <div class="mb-2 text-red-600">{{ error }}</div>
+        {% endif %}
+        <form id="create-area-form" method="post" action="/allocation/">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="create" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Nombre del área</label>
+              <input name="area_nombre" id="area_nombre" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Clave del dispositivo</label>
+              <input name="dispositivo_clave" id="dispositivo_clave" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Ruta del dispositivo</label>
+              <input name="dispositivo_ruta" id="dispositivo_ruta" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="create-modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="create-modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Crear</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Edit / Delete Area Modal (mismo diseño que Create Area) -->
+    <div id="edit-area-modal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
+      <div class="bg-white rounded-lg w-2/3 p-8 relative">
+        <button id="edit-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
+        <h2 class="text-2xl font-bold mb-4">Editar Área</h2>
+        {% if error %}
+          <div class="mb-2 text-red-600">{{ error }}</div>
+        {% endif %}
+        <form id="edit-area-form" method="post" action="/allocation/">
+          {% csrf_token %}
+          <input type="hidden" name="action" id="edit-action" value="update" />
+          <input type="hidden" name="area_id" id="edit-area-id" />
+          <input type="hidden" name="dispositivo_id" id="edit-dispositivo-id" />
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium">Nombre del área</label>
+              <input name="area_nombre" id="edit-area-nombre" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Clave del dispositivo</label>
+              <input name="dispositivo_clave" id="edit-dispositivo-clave" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium">Ruta del dispositivo</label>
+              <input name="dispositivo_ruta" id="edit-dispositivo-ruta" class="mt-1 p-2 rounded bg-gray-200/80 w-full" />
+            </div>
+          </div>
+          <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-delete" class="px-6 py-2 bg-red-500/30 border border-red-500 rounded-full cursor-pointer">Eliminar</button>
+            <button type="button" id="edit-modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
+            <button id="edit-modal-submit" type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Guardar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
     <div class="absolute start-0 top-[12%] z-5 flex flex-col w-full h-full mx-15">
       <div class="w-[93%] h-full text-center font-bold flex flex-col justify-center items-center">
         <h1 class="text-5xl p-5">Asignacion de espacio</h1>
@@ -37,27 +129,388 @@
             <div class="w-full h-1/10 flex justify-center items-center bg-[#E6E6E6]">
               <h1 class="w-full py-2 text-left text-3xl px-5">Area</h1>
             </div>
-            <div class="w-full h-9/10"></div>
+            <div class="w-full h-9/10">
+              <div class="w-full h-full overflow-y-auto">
+                <table class="w-full table-auto">
+                  <thead>
+                    <tr class="bg-gray-200">
+                      <th class="px-4 py-2 text-left">Nombre</th>
+                      <th class="px-4 py-2 text-left">Disponibles</th>
+                      <th class="px-4 py-2 text-left">Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for area in areas %}
+                      <tr class="border-b cursor-pointer" data-area-id="{{ area.id }}" data-area-name="{{ area.nombre }}" data-dispositivo-id="{{ area.dispositivo_id }}" data-dispositivo-clave="{{ area.dispositivo_clave }}" data-dispositivo-ruta="{{ area.dispositivo_ruta }}">
+                        <td class="px-4 py-2 text-left">
+                          <span class="inline-block mr-4 align-middle" style="width:10px; height:100%; display:inline-block; background-color: {{ area.color }}; border-radius:3px;"></span>{{ area.nombre }}
+                        </td>
+                        <td class="px-4 py-2 text-left">{{ area.capacidad_disponible }} disponibles</td>
+                        <td class="px-4 py-2 text-left flex items-center">
+                          <button type="button" class="area-edit-btn text-xl cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
+                        </td>
+                      </tr>
+                    {% empty %}
+                      <tr class="border-b">
+                        <td class="px-4 py-2 text-left" colspan="3">No hay áreas registradas.</td>
+                      </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+            </div>
             <div class="w-full h-1/10 flex justify-center pb-4">
               <div class="mb-1 w-full h-full flex items-center justify-center">
-                <button class="block h-full bg-black rounded-lg flex items-center px-2 cursor-pointer">
+                <button id="open-create-area" class="block h-full bg-black rounded-lg flex items-center px-2 cursor-pointer">
                   <span class="text-xl flex items-center h-full text-blue-500"><span class="fi fi-br-plus"></span></span>
-                  <label class="block h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Acceso</label>
+                  <label class="block h-full flex items-center px-2 cursor-pointer text-white font-semibold text-lg">Crear Área</label>
                 </button>
               </div>
             </div>
           </div>
           <div class="w-2/3 bg-blue-500 h-[80%] m-4 bg-white flex flex-col justify-center items-center gap-5">
-            <div class="w-full h-8/10 border-2 border-red-500 rounded-lg shadow-lg"></div>
-            <div class="w-full h-2/10 flex justify-center">
+            <div id="area-video" class="w-full max-h-8/10 h-8/10 border-2 border-gray-400 rounded-lg shadow-lg flex items-center justify-center text-gray-500 overflow-hidden bg-black">
+              <div id="video-placeholder" class="text-center">
+                <p class="text-lg">Selecciona un área para iniciar la detección.</p>
+                <p class="text-sm text-gray-400 mt-2">El sistema detectará automáticamente los espacios de estacionamiento.</p>
+              </div>
+              <img id="detection-stream" class="hidden w-full h-full object-contain" alt="Stream de detección" />
+            </div>
+            <div class="w-full h-2/10 flex justify-center gap-4">
               <div class="w-[45%] border-2 border-gray-400/80 rounded-lg shadow-lg">
                 <h1 class="text-3xl p-4 font-semibold">Cajones disponibles</h1>
-                <label class="text-2xl p-4 font-semibold" for="cajones">6</label>
+                <label id="cajones-libres" class="text-2xl p-4 font-semibold">-</label>
+              </div>
+              <div class="w-[45%] border-2 border-gray-400/80 rounded-lg shadow-lg">
+                <h1 class="text-3xl p-4 font-semibold">Cajones ocupados</h1>
+                <label id="cajones-ocupados" class="text-2xl p-4 font-semibold text-red-500">-</label>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const openBtn = document.getElementById('open-create-area')
+        const modal = document.getElementById('create-area-modal')
+        const closeBtn = document.getElementById('create-modal-close')
+        const cancelBtn = document.getElementById('create-modal-cancel')
+      
+        function showModal() {
+          if (!modal) return
+          modal.classList.remove('hidden')
+          modal.classList.add('flex')
+        }
+        function hideModal() {
+          if (!modal) return
+          modal.classList.remove('flex')
+          modal.classList.add('hidden')
+        }
+      
+        if (openBtn) openBtn.addEventListener('click', showModal)
+        if (closeBtn) closeBtn.addEventListener('click', hideModal)
+        if (cancelBtn) cancelBtn.addEventListener('click', hideModal)
+      
+        // close modal on backdrop click
+        if (modal) {
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) hideModal()
+          })
+        }
+        // edit modal handlers
+        const editModal = document.getElementById('edit-area-modal')
+        const editClose = document.getElementById('edit-modal-close')
+        const editCancel = document.getElementById('edit-modal-cancel')
+        const editDelete = document.getElementById('edit-modal-delete')
+        const editForm = document.getElementById('edit-area-form')
+        const editActionInput = document.getElementById('edit-action')
+        const editAreaId = document.getElementById('edit-area-id')
+        const editAreaNombre = document.getElementById('edit-area-nombre')
+        const editDispositivoId = document.getElementById('edit-dispositivo-id')
+        const editDispositivoClave = document.getElementById('edit-dispositivo-clave')
+        const editDispositivoRuta = document.getElementById('edit-dispositivo-ruta')
+      
+        function showEditModal() {
+          if (!editModal) return
+          editModal.classList.remove('hidden')
+          editModal.classList.add('flex')
+        }
+        function hideEditModal() {
+          if (!editModal) return
+          editModal.classList.remove('flex')
+          editModal.classList.add('hidden')
+        }
+      
+        document.querySelectorAll('.area-edit-btn').forEach((btn) => {
+          btn.addEventListener('click', (e) => {
+            e.stopPropagation()
+            const tr = e.target.closest('tr') || e.target.parentElement.closest('tr')
+            if (!tr) return
+            const id = tr.dataset.areaId
+            const name = tr.dataset.areaName
+            const dispId = tr.dataset.dispositivoId || ''
+            const dispClave = tr.dataset.dispositivoClave || ''
+            const dispRuta = tr.dataset.dispositivoRuta || ''
+            editAreaId.value = id
+            editAreaNombre.value = name
+            if (editDispositivoId) editDispositivoId.value = dispId
+            if (editDispositivoClave) editDispositivoClave.value = dispClave
+            if (editDispositivoRuta) editDispositivoRuta.value = dispRuta
+            editActionInput.value = 'update'
+            showEditModal()
+          })
+        })
+      
+        if (editClose) editClose.addEventListener('click', hideEditModal)
+        if (editCancel) editCancel.addEventListener('click', hideEditModal)
+      
+        if (editDelete) {
+          editDelete.addEventListener('click', function () {
+            // set action to delete and submit
+            if (!editActionInput) return
+            editActionInput.value = 'delete'
+            editForm.submit()
+          })
+        }
+        // close edit modal on backdrop click
+        if (editModal) {
+          editModal.addEventListener('click', function (e) {
+            if (e.target === editModal) hideEditModal()
+          })
+        }
+      
+        // ============================================================
+        // DETECCIÓN DE ESPACIOS - Stream MJPEG y actualización de estado
+        // ============================================================
+        const videoContainer = document.getElementById('area-video')
+        const videoPlaceholder = document.getElementById('video-placeholder')
+        const detectionStream = document.getElementById('detection-stream')
+        const cajonesLibres = document.getElementById('cajones-libres')
+        const cajonesOcupados = document.getElementById('cajones-ocupados')
+        let currentAreaId = null
+        let statusInterval = null
+      
+        function startDetection(areaId, areaName) {
+          // Si hay un detector anterior activo, pedir que se detenga
+          if (currentAreaId && currentAreaId !== areaId) {
+            try {
+              fetch('/detection/control/' + currentAreaId + '/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'stop' })
+              }).catch(() => {})
+            } catch (e) {}
+          }
+      
+          currentAreaId = areaId
+      
+          // Mostrar stream de detección
+          if (videoPlaceholder) videoPlaceholder.classList.add('hidden')
+          if (detectionStream) {
+            detectionStream.classList.remove('hidden')
+            // Forzar nueva solicitud al servidor añadiendo timestamp para evitar cache
+            detectionStream.src = '/detection/stream/' + areaId + '/?t=' + Date.now()
+            detectionStream.alt = 'Detección en ' + areaName
+          }
+      
+          // Iniciar polling de estado de espacios
+          if (statusInterval) clearInterval(statusInterval)
+          updateEspaciosStatus(areaId)
+          statusInterval = setInterval(function () {
+            updateEspaciosStatus(areaId)
+          }, 2000) // Actualizar cada 2 segundos
+      
+          showToast('Detección iniciada para ' + areaName, 'success')
+        }
+      
+        function stopDetection() {
+          if (statusInterval) {
+            clearInterval(statusInterval)
+            statusInterval = null
+          }
+          if (detectionStream) {
+            detectionStream.src = ''
+            detectionStream.classList.add('hidden')
+          }
+          if (videoPlaceholder) videoPlaceholder.classList.remove('hidden')
+          if (cajonesLibres) cajonesLibres.textContent = '-'
+          if (cajonesOcupados) cajonesOcupados.textContent = '-'
+          currentAreaId = null
+        }
+      
+        function updateEspaciosStatus(areaId) {
+          fetch('/detection/espacios/' + areaId + '/')
+            .then(function (response) {
+              return response.json()
+            })
+            .then(function (data) {
+              if (data.error) {
+                console.error('Error:', data.error)
+                return
+              }
+              if (cajonesLibres) cajonesLibres.textContent = data.libres
+              if (cajonesOcupados) cajonesOcupados.textContent = data.ocupados
+      
+              // Actualizar tabla de áreas
+              const row = document.querySelector('tr[data-area-id="' + areaId + '"]')
+              if (row) {
+                const dispCell = row.querySelector('td:nth-child(2)')
+                if (dispCell) {
+                  dispCell.textContent = data.libres + ' disponibles'
+                }
+              }
+            })
+            .catch(function (err) {
+              console.error('Error al obtener estado:', err)
+            })
+        }
+      
+        // Click en filas de la tabla para iniciar detección
+        const rows = document.querySelectorAll('tbody tr[data-area-id]')
+        rows.forEach((tr) => {
+          tr.setAttribute('role', 'button')
+          tr.setAttribute('tabindex', '0')
+          tr.classList.add('area-row')
+          tr.addEventListener('click', function () {
+            const areaId = tr.dataset.areaId
+            const ruta = tr.dataset.dispositivoRuta || ''
+            const name = tr.dataset.areaName || ''
+      
+            // highlight selected
+            rows.forEach((r) => r.classList.remove('bg-gray-100', 'ring-2', 'ring-blue-300'))
+            tr.classList.add('bg-gray-100', 'ring-2', 'ring-blue-300')
+      
+            if (!videoContainer) return
+      
+            if (!ruta) {
+              showToast('Área ' + name + ' no tiene ruta de dispositivo configurada.', 'info')
+              stopDetection()
+              if (videoPlaceholder) {
+                videoPlaceholder.innerHTML = '<p class="text-lg">No hay fuente de video disponible para ' + name + '.</p>'
+                videoPlaceholder.classList.remove('hidden')
+              }
+              return
+            }
+      
+            // Iniciar detección para esta área
+            startDetection(areaId, name)
+          })
+          tr.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault()
+              tr.click()
+            }
+          })
+        })
+      })
+      // toasts and client-side validation (aligned with other templates)
+      const toastContainer = document.getElementById('toast-container')
+      
+      function showToast(message, type = 'error') {
+        const container = document.getElementById('toast-container')
+        if (!container) return
+        const t = document.createElement('div')
+        t.className = 'toast px-4 py-2 rounded shadow-lg text-white flex items-center gap-3'
+        if (type === 'success') t.classList.add('bg-green-600')
+        else if (type === 'error') t.classList.add('bg-red-600')
+        else t.classList.add('bg-gray-700')
+        const inner = document.createElement('div')
+        inner.className = 'flex-1'
+        inner.textContent = message
+        const btn = document.createElement('button')
+        btn.className = 'toast-close ml-2 text-white opacity-90 cursor-pointer'
+        btn.innerHTML = '&times;'
+        t.appendChild(inner)
+        t.appendChild(btn)
+        container.appendChild(t)
+        const timer = setTimeout(() => t.remove(), 4000)
+        if (btn)
+          btn.addEventListener('click', () => {
+            clearTimeout(timer)
+            t.remove()
+          })
+      }
+      
+      function markInvalid(el) {
+        if (!el) return
+        const prev = el.style.boxShadow
+        el.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.25)'
+        el.focus()
+        setTimeout(() => {
+          el.style.boxShadow = prev
+        }, 2200)
+      }
+      
+      // attach close handlers to server-rendered toasts
+      if (toastContainer) {
+        const toasts = toastContainer.querySelectorAll('.toast')
+        toasts.forEach((t) => {
+          const close = t.querySelector('.toast-close')
+          const hide = () => t.remove()
+          const timer = setTimeout(hide, 4000)
+          if (close)
+            close.addEventListener('click', () => {
+              clearTimeout(timer)
+              hide()
+            })
+        })
+      }
+      
+      // Create form validation
+      const createForm = document.getElementById('create-area-form')
+      if (createForm) {
+        createForm.addEventListener('submit', function (e) {
+          const nombre = document.getElementById('area_nombre')
+          const clave = document.getElementById('dispositivo_clave')
+          const ruta = document.getElementById('dispositivo_ruta')
+          if (!nombre || !nombre.value.trim()) {
+            e.preventDefault()
+            showToast('El nombre del área es requerido.', 'error')
+            markInvalid(nombre)
+            return
+          }
+          if (!clave || !clave.value.trim()) {
+            e.preventDefault()
+            showToast('La clave del dispositivo es requerida.', 'error')
+            markInvalid(clave)
+            return
+          }
+          if (!ruta || !ruta.value.trim()) {
+            e.preventDefault()
+            showToast('La ruta del dispositivo es requerida.', 'error')
+            markInvalid(ruta)
+            return
+          }
+        })
+      }
+      
+      // Edit form validation and delete confirm
+      const editFormEl = document.getElementById('edit-area-form')
+      if (editFormEl) {
+        editFormEl.addEventListener('submit', function (e) {
+          const nombre = document.getElementById('edit-area-nombre')
+          if (!nombre || !nombre.value.trim()) {
+            e.preventDefault()
+            showToast('El nombre del área es requerido.', 'error')
+            markInvalid(nombre)
+            return
+          }
+        })
+      }
+      
+      if (editDelete) {
+        editDelete.addEventListener('click', function () {
+          if (!editActionInput || !editForm) return
+          const confirmed = confirm('¿Eliminar esta área y todos sus espacios y dispositivos asociados? Esta acción no se puede deshacer.')
+          if (!confirmed) {
+            showToast('Eliminación cancelada.', 'info')
+            return
+          }
+          editActionInput.value = 'delete'
+          editForm.submit()
+        })
+      }
+    </script>
   </body>
 </html>

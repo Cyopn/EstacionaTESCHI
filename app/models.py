@@ -6,10 +6,6 @@ from django.contrib.auth.hashers import make_password, identify_hasher
 
 class Area(models.Model):
     nombre = models.CharField(max_length=100, verbose_name="Nombre")
-    capacidad_total = models.PositiveIntegerField(
-        verbose_name="Capacidad total")
-    capacidad_disponible = models.PositiveIntegerField(
-        verbose_name="Capacidad disponible", default=0)
 
     fecha_creacion = models.DateTimeField(
         auto_now_add=True, verbose_name="Fecha de creación")
@@ -22,6 +18,66 @@ class Area(models.Model):
     class Meta:
         verbose_name = "Área"
         verbose_name_plural = "Áreas"
+
+
+class Dispositivo(models.Model):
+    clave = models.CharField(max_length=100, unique=True, verbose_name="Clave")
+    ruta = models.CharField(max_length=255, verbose_name="Ruta")
+    area = models.ForeignKey(
+        'Area',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='dispositivos',
+        verbose_name='Área'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
+    def __str__(self):
+        return f"{self.clave} - {self.ruta}"
+
+    class Meta:
+        verbose_name = "Dispositivo"
+        verbose_name_plural = "Dispositivos"
+
+
+class Espacio(models.Model):
+    clave = models.CharField(max_length=50, unique=True, verbose_name="Clave")
+
+    class Estado(models.TextChoices):
+        OCUPADO = 'OCUPADO', 'Ocupado'
+        LIBRE = 'LIBRE', 'Libre'
+
+    estado = models.CharField(max_length=10, choices=Estado.choices,
+                              default=Estado.LIBRE, verbose_name="Estado")
+
+    discapacitado = models.BooleanField(
+        default=False, verbose_name="Discapacitado")
+
+    area = models.ForeignKey(
+        'Area',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='espacios',
+        verbose_name='Área'
+    )
+
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name="Fecha de creación")
+    fecha_modificacion = models.DateTimeField(
+        auto_now=True, verbose_name="Fecha de modificación")
+
+    def __str__(self):
+        return f"{self.clave} ({self.get_estado_display()})"
+
+    class Meta:
+        verbose_name = "Espacio"
+        verbose_name_plural = "Espacios"
 
 
 class Empleado(models.Model):

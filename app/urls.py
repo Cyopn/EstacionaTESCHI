@@ -12,6 +12,9 @@ from app.vehicle.vehicle_view import VehicleView
 from app.sanction.sanction_view import SanctionView
 from app.events.events_view import EventsView
 from app.access.access_view import AccessView
+from app.detection.detection_views import (
+    DetectorStreamView, DetectorControlView, EspaciosStatusView
+)
 
 urlpatterns = [
     path('', RootView.as_view(), name='home'),
@@ -27,4 +30,10 @@ urlpatterns = [
     path('sanction/', SanctionView.as_view(), name='sanction'),
     path('events/', EventsView.as_view(), name='events'),
     path('access/', AccessView.as_view(), name='access'),
+    path('detection/stream/<int:area_id>/',
+         DetectorStreamView.as_view(), name='detection_stream'),
+    path('detection/control/<int:area_id>/',
+         DetectorControlView.as_view(), name='detection_control'),
+    path('detection/espacios/<int:area_id>/',
+         EspaciosStatusView.as_view(), name='detection_espacios'),
 ]
