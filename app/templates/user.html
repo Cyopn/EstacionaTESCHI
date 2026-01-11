@@ -54,7 +54,6 @@
       </a>
       <div class="relative flex items-center gap-6">
         <a href="/access/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-ss-time-past"></span></a>
-        <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
       </div>
     </nav>
     <main class="w-full h-[88%]">
@@ -79,18 +78,20 @@
                 <th class="border border-none px-4 py-2 text-center">Correo</th>
                 <th class="border border-none px-4 py-2 text-center">Matrícula</th>
                 <th class="border border-none px-4 py-2 text-center">Teléfono</th>
+                <th class="border border-none px-4 py-2 text-center">Área</th>
                 <th class="border border-none px-4 py-2 text-center">Editar</th>
               </tr>
             </thead>
             <tbody>
               {% if usuarios %}
                 {% for usuario in usuarios %}
-                  <tr class="hover:bg-gray-100 border-b border-black" data-matricula="{{ usuario.matricula|escape }}" data-nombre="{{ usuario.nombre|escape }}" data-apellidos="{{ usuario.apellidos|escape }}" data-correo="{{ usuario.correo|escape }}" data-telefono="{{ usuario.telefono|default_if_none:''|escape }}">
+                  <tr class="hover:bg-gray-100 border-b border-black" data-matricula="{{ usuario.matricula|escape }}" data-nombre="{{ usuario.nombre|escape }}" data-apellidos="{{ usuario.apellidos|escape }}" data-correo="{{ usuario.correo|escape }}" data-telefono="{{ usuario.telefono|default_if_none:''|escape }}" data-area-id="{{ usuario.area.id|default_if_none:'' }}" data-area-nombre="{{ usuario.area.nombre|default_if_none:''|escape }}">
                     <td class="border border-none px-4 py-2 text-center">{{ usuario.nombre }}</td>
                     <td class="border border-none px-4 py-2 text-center">{{ usuario.apellidos }}</td>
                     <td class="border border-none px-4 py-2 text-center">{{ usuario.correo }}</td>
                     <td class="border border-none px-4 py-2 text-center">{{ usuario.matricula }}</td>
                     <td class="border border-none px-4 py-2 text-center">{{ usuario.telefono }}</td>
+                    <td class="border border-none px-4 py-2 text-center">{{ usuario.area.nombre|default_if_none:'Sin área' }}</td>
                     <td class="border border-none px-4 py-2 text-center">
                       <button type="button" class="edit-btn px-3 py-1 text-black rounded cursor-pointer"><span class="fi fi-rr-pencil"></span></button>
                     </td>
@@ -135,6 +136,15 @@
               <label class="block text-sm font-medium">Teléfono</label>
               <input id="modal-telefono" name="telefono" class="mt-1 w-full p-2 rounded bg-gray-200/80" />
             </div>
+            <div>
+              <label class="block text-sm font-medium">Área</label>
+              <select id="modal-area" name="area" class="mt-1 w-full p-2 rounded bg-gray-200/80">
+                <option value="">Sin área</option>
+                {% for area in areas %}
+                  <option value="{{ area.id }}">{{ area.nombre }}</option>
+                {% endfor %}
+              </select>
+            </div>
           </div>
           <div class="mt-6 flex justify-end gap-3">
             <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
@@ -167,6 +177,7 @@
           document.getElementById('modal-correo').value = row.dataset.correo || ''
           document.getElementById('modal-contrasena').value = ''
           document.getElementById('modal-telefono').value = row.dataset.telefono || ''
+          document.getElementById('modal-area').value = row.dataset.areaId || ''
         }
         document.querySelectorAll('.edit-btn').forEach((btn) => {
           btn.addEventListener('click', function (e) {
@@ -197,7 +208,7 @@
           const rows = Array.from(tbody.querySelectorAll('tr'))
           let visible = 0
           rows.forEach((row) => {
-            const fields = [row.dataset.matricula || '', row.dataset.nombre || '', row.dataset.apellidos || '', row.dataset.correo || '', row.dataset.telefono || '']
+            const fields = [row.dataset.matricula || '', row.dataset.nombre || '', row.dataset.apellidos || '', row.dataset.correo || '', row.dataset.telefono || '', row.dataset.areaNombre || '']
             const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
             if (matches) {
               row.style.display = ''

@@ -21,7 +21,7 @@
         overflow: auto;
       }
     </style>
-    <title>Vehiculos - EstacionaTESCHI</title>
+    <title>Historia del accesos - EstacionaTESCHI</title>
   </head>
   <body class="w-screen h-screen overflow-hidden">
     <nav class="p-4 bg-white shadow-md flex items-center justify-between h-[12%] w-full z-2">
@@ -30,7 +30,7 @@
         <span class="text-3xl font-bold text-[#0E549E]">Estaciona</span><span class="text-3xl font-bold text-[#7ABC44]">TESCHI</span>
       </a>
       <div class="relative flex items-center gap-6">
-        <a href="/notification/" class="end-0 text-5xl cursor-pointer"><span class="fi fi-sc-bell"></span></a>
+         
       </div>
     </nav>
     <main class="w-full h-[88%]">
@@ -53,6 +53,7 @@
                 <th class="border border-none px-4 py-2 text-center">N. acceso</th>
                 <th class="border border-none px-4 py-2 text-center">Fecha</th>
                 <th class="border border-none px-4 py-2 text-center">Tipo</th>
+                <th class="border border-none px-4 py-2 text-center">Matricula</th>
                 <th class="border border-none px-4 py-2 text-center">Nombre</th>
                 <th class="border border-none px-4 py-2 text-center">Placa</th>
               </tr>
@@ -60,12 +61,17 @@
             <tbody>
               {% if accesos %}
                 {% for acceso in accesos %}
-                  <tr class="hover:bg-gray-100 border-b border-black" data-acceso-id="{{ acceso.id }}" data-fecha="{{ acceso.fecha|date:'d-m-Y H:i' }}" data-tipo="{{ acceso.tipo|escape }}" data-usuario="{{ acceso.usuario.nombre|default_if_none:''|escape }}" data-placa="{{ acceso.vehiculo.placa|default_if_none:''|escape }}">
+                  <tr class="hover:bg-gray-100 border-b border-black" data-acceso-id="{{ acceso.id }}" data-fecha="{{ acceso.fecha|date:'d-m-Y H:i' }}" data-tipo="{{ acceso.tipo|escape }}" data-matricula="{{ acceso.usuario.matricula|default_if_none:''|escape }}" data-usuario="{{ acceso.usuario.nombre|default_if_none:''|escape }} {{ acceso.usuario.apellidos|default_if_none:''|escape }}" data-placa="{{ acceso.vehiculo.placa|default_if_none:''|escape }}">
                     <td class="border border-none px-4 py-2 text-center">{{ acceso.id }}</td>
                     <td class="border border-none px-4 py-2 text-center">{{ acceso.fecha|date:'d-m-Y H:i' }}</td>
                     <td class="border border-none px-4 py-2 text-center">{{ acceso.get_tipo_display }}</td>
                     <td class="border border-none px-4 py-2 text-center">
-                      {% if acceso.usuario %}{{ acceso.usuario.nombre }}{% endif %}
+                      {% if acceso.usuario %}{{ acceso.usuario.matricula }}{% endif %}
+                    </td>
+                    <td class="border border-none px-4 py-2 text-center">
+                      {% if acceso.usuario %}
+                        {{ acceso.usuario.nombre }} {{ acceso.usuario.apellidos }}
+                      {% endif %}
                     </td>
                     <td class="border border-none px-4 py-2 text-center">
                       {% if acceso.vehiculo %}{{ acceso.vehiculo.placa }}{% endif %}
@@ -74,7 +80,7 @@
                 {% endfor %}
               {% else %}
                 <tr>
-                  <td class="px-4 py-2" colspan="5">No hay accesos registrados.</td>
+                  <td class="px-4 py-2" colspan="6">No hay accesos registrados.</td>
                 </tr>
               {% endif %}
             </tbody>
@@ -101,7 +107,7 @@
           const rows = Array.from(tbody.querySelectorAll('tr'))
           let visible = 0
           rows.forEach((row) => {
-            const fields = [row.dataset.accesoId || '', row.dataset.fecha || '', row.dataset.tipo || '', row.dataset.usuario || '', row.dataset.placa || '']
+            const fields = [row.dataset.accesoId || '', row.dataset.fecha || '', row.dataset.tipo || '', row.dataset.matricula || '', row.dataset.usuario || '', row.dataset.placa || '']
             const matches = term === '' || fields.some((f) => String(f).toLowerCase().trim().startsWith(term))
             if (matches) {
               row.style.display = ''

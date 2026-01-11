@@ -60,7 +60,7 @@ class ParkingDetector:
         self.espacios_map = {}
         self.detection_counts = defaultdict(int)
 
-        self.COLOR_OCCUPIED = (0, 0, 255) 
+        self.COLOR_OCCUPIED = (0, 0, 255)
         self.COLOR_FREE = (0, 255, 0)
         self.COLOR_BBOX = (255, 165, 0)
         self.COLOR_SPOT = (255, 255, 0)
@@ -78,13 +78,22 @@ class ParkingDetector:
 
         project_root = os.path.dirname(os.path.dirname(
             os.path.dirname(os.path.abspath(__file__))))
-        model_full_path = os.path.join(project_root, self.model_path)
 
-        if not os.path.exists(model_full_path):
-            print(f"Descargando modelo {self.model_path}...")
-            self.model = YOLO(self.model_path)
-        else:
+        candidates = [
+            os.path.join(project_root, self.model_path),
+            os.path.join(project_root, 'models',
+                         os.path.basename(self.model_path)),
+            self.model_path,
+        ]
+
+        model_full_path = next(
+            (p for p in candidates if os.path.exists(p)), None)
+
+        if model_full_path:
             self.model = YOLO(model_full_path)
+        else:
+            raise FileNotFoundError(
+                f"No se encontró el modelo YOLO en ninguna de las rutas: {candidates}")
 
         print(f"Modelo cargado: {self.model_path}")
 
