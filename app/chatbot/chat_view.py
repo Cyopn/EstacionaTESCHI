@@ -179,7 +179,8 @@ class ChatbotView(APIView):
         # Fallback: primero intento LLM con contexto; si falla, uso ML simple
         history_lines = self._history_lines(conversation)
         try:
-            texto = self._llm_wrap(message, facts={"historial": history_lines[-6:]})
+            texto = self._llm_wrap(
+                message, facts={"historial": history_lines[-6:]})
         except Exception:
             ml_model = get_ml_chat_model()
             texto = ml_model.respond(message, history_lines)
@@ -195,11 +196,13 @@ class ChatbotView(APIView):
         return any(k in text for k in keywords)
 
     def _is_list_areas_intent(self, text: str) -> bool:
-        keywords = ["lista", "listar", "muestr", "qué áreas", "que areas", "cuales areas", "qué zonas", "que zonas"]
+        keywords = ["lista", "listar", "muestr", "qué áreas",
+                    "que areas", "cuales areas", "qué zonas", "que zonas"]
         return any(k in text for k in keywords)
 
     def _is_events_intent(self, text: str) -> bool:
-        keywords = ["evento", "eventos", "programado", "programados", "agenda", "agenda de eventos"]
+        keywords = ["evento", "eventos", "programado",
+                    "programados", "agenda", "agenda de eventos"]
         return any(k in text for k in keywords)
 
     def _is_greeting(self, text: str) -> bool:

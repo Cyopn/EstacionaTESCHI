@@ -96,7 +96,8 @@ def find_area_by_name_fragment(text: str) -> Optional[Area]:
         # Prefix match: if text starts with key tokens from area name
         name_tokens = [t for t in name_norm.split() if t]
         if name_tokens:
-            prefix = " ".join(name_tokens[:2]) if len(name_tokens) >= 2 else name_tokens[0]
+            prefix = " ".join(name_tokens[:2]) if len(
+                name_tokens) >= 2 else name_tokens[0]
             if prefix in text_norm:
                 best_area = best_area or area
 
