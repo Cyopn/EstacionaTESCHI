@@ -17,7 +17,7 @@
       </div>
       <div class="flex flex-row justify-start ml-20 items-center content-center absolute top-0 z-[3] w-full h-full">
         <div class="flex flex-col bg-white w-[40%] rounded-4xl text-black inset-shadow-sm inset-shadow-gray-500 shadow-xl/20">
-          <h1 class="text-4xl pt-10 pb-5 text-center font-bold">Registrate</h1>
+          <h1 class="text-4xl pt-10 pb-5 text-center font-bold">Regístrate</h1>
           <span class="fi fi-sr-user text-8xl py-2 text-center w-full"></span>
           <form method="post" class="flex flex-col items-center justify-center w-full text-black">
             {% csrf_token %}
@@ -69,13 +69,13 @@
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-phone-flip"></span></span>
               </div>
-              <input name="telefono" value="{{ telefono|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Numero de telefono" required />
+              <input name="telefono" value="{{ telefono|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Número de teléfono" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
                 <span class="items-center px-3 text-sm w-4 h-4"><span class="fi fi-sr-phone-flip"></span></span>
               </div>
-              <input name="numero_empleado" value="{{ numero_empleado|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Numero de empleado" required />
+              <input name="numero_empleado" value="{{ numero_empleado|default:'' }}" class="block py-2 w-full p-2.5 w-full z-20 text-gray-700 rounded-full bg-gray-200/80 text-center" placeholder="Número de empleado" required />
             </div>
             <div class="relative w-[65%] py-4">
               <div class="absolute inset-y-0 start-0 flex items-center pointer-events-none">
