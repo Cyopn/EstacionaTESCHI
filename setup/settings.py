@@ -41,6 +41,7 @@ INSTALLED_APPS = [
 ]
 # Local apps
 INSTALLED_APPS += [
+    'rest_framework',
     'app',
 ]
 
@@ -134,3 +135,12 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+REST_FRAMEWORK = {
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+    ],
+}

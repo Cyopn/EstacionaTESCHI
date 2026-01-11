@@ -324,3 +324,55 @@ class Acceso(models.Model):
     class Meta:
         verbose_name = "Acceso"
         verbose_name_plural = "Accesos"
+
+
+class ChatConversation(models.Model):
+    usuario = models.ForeignKey(
+        'Usuario',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='conversaciones_chat',
+        verbose_name='Usuario'
+    )
+    titulo = models.CharField(
+        max_length=200, blank=True, verbose_name='Título')
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name='Fecha de creación')
+
+    def __str__(self):
+        base = self.titulo or f"Conversación {self.id}"
+        return base
+
+    class Meta:
+        verbose_name = "Conversación de chat"
+        verbose_name_plural = "Conversaciones de chat"
+
+
+class ChatMessage(models.Model):
+    conversation = models.ForeignKey(
+        'ChatConversation',
+        on_delete=models.CASCADE,
+        related_name='mensajes',
+        verbose_name='Conversación'
+    )
+    usuario = models.ForeignKey(
+        'Usuario',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='mensajes_chat',
+        verbose_name='Usuario'
+    )
+    mensaje = models.TextField(verbose_name='Mensaje')
+    respuesta = models.TextField(verbose_name='Respuesta')
+    tiempo_ms = models.PositiveIntegerField(
+        verbose_name='Tiempo de respuesta (ms)')
+    fecha = models.DateTimeField(auto_now_add=True, verbose_name='Fecha')
+
+    def __str__(self):
+        return f"Mensaje {self.id} en conversación {self.conversation_id}"
+
+    class Meta:
+        verbose_name = "Mensaje de chat"
+        verbose_name_plural = "Mensajes de chat"
