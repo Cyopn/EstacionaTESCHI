@@ -231,11 +231,12 @@
         }
     
         const usuario = info.usuario || {}
+        const espacio = info.espacio || null
         placaEl.innerText = info.placa || ''
         modeloEl.innerText = `${info.marca || ''} ${info.modelo || ''}`.trim()
         propEl.innerText = `${usuario.nombre || ''} ${usuario.apellidos || ''}`.trim()
         matEl.innerText = usuario.matricula || ''
-        cajonEl.innerText = ''
+        cajonEl.innerText = espacio?.clave || 'Sin espacio disponible'
         if (entryBox) entryBox.style.backgroundColor = '#45FF6D'
         if (entryLabel) entryLabel.innerText = `${info.placa} - ACCESO AUTORIZADO`
         if (eventLabel) eventLabel.innerText = 'Acceso autorizado'

@@ -326,6 +326,42 @@ class Acceso(models.Model):
         verbose_name_plural = "Accesos"
 
 
+class Notificacion(models.Model):
+    class Tipo(models.TextChoices):
+        ACCESO_AUTORIZADO = 'ACCESO_AUTORIZADO', 'Acceso autorizado'
+        SALIDA = 'SALIDA', 'Salida'
+        OTRO = 'OTRO', 'Otro'
+
+    usuario = models.ForeignKey(
+        'Usuario',
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+        related_name='notificaciones',
+        verbose_name='Usuario'
+    )
+    tipo = models.CharField(
+        max_length=30,
+        choices=Tipo.choices,
+        default=Tipo.OTRO,
+        verbose_name='Tipo'
+    )
+    cuerpo = models.CharField(max_length=255, verbose_name='Cuerpo')
+    descripcion = models.TextField(blank=True, verbose_name='Descripción')
+    leido = models.BooleanField(default=False, verbose_name='Leído')
+    fecha_creacion = models.DateTimeField(
+        auto_now_add=True, verbose_name='Fecha de creación'
+    )
+
+    def __str__(self):
+        user_repr = str(self.usuario) if self.usuario else 'Sin usuario'
+        return f"{self.get_tipo_display()} - {user_repr} - {self.cuerpo[:30]}"
+
+    class Meta:
+        verbose_name = "Notificación"
+        verbose_name_plural = "Notificaciones"
+
+
 class ChatConversation(models.Model):
     usuario = models.ForeignKey(
         'Usuario',

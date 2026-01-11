@@ -3,11 +3,14 @@ Vistas para el servicio de detección de placas vehiculares.
 Entrega streaming MJPEG y permite controlar el detector.
 """
 import json
+from app.notification.notification_broker import broadcast
 from django.http import JsonResponse, StreamingHttpResponse
 from django.utils import timezone
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.decorators import method_decorator
+
+from django.db import transaction
 
 from app.detection.plate_detector_service import (
     get_plate_detector,
@@ -15,7 +18,26 @@ from app.detection.plate_detector_service import (
     start_plate_detector_by_source,
     stop_plate_detector,
 )
-from app.models import Vehiculo, Acceso
+from app.models import Vehiculo, Acceso, Espacio, Notificacion
+
+
+def _assign_space_for_user(usuario):
+    """Return first libre space, preferring user's area, without altering estado."""
+    if not usuario:
+        return None
+
+    qs = Espacio.objects
+
+    if usuario.area_id:
+        espacio = (
+            qs.filter(area_id=usuario.area_id, estado=Espacio.Estado.LIBRE)
+            .order_by('clave')
+            .first()
+        )
+        if espacio:
+            return espacio
+
+    return qs.filter(estado=Espacio.Estado.LIBRE).order_by('clave').first()
 
 
 def _generate_mjpeg(detector):
@@ -24,23 +46,6 @@ def _generate_mjpeg(detector):
         yield (
             b'--frame\r\n'
             b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n'
-        )
-
-
-class PlateStreamView(View):
-    """Stream MJPEG con detección de placas."""
-
-    def get(self, request, device_id):
-        detector = get_plate_detector(device_id)
-        if not detector or not detector.running:
-            try:
-                detector = start_plate_detector(device_id)
-            except ValueError as exc:
-                return JsonResponse({'error': str(exc)}, status=400)
-
-        return StreamingHttpResponse(
-            _generate_mjpeg(detector),
-            content_type='multipart/x-mixed-replace; boundary=frame'
         )
 
 
@@ -55,6 +60,23 @@ class PlateStreamByIpView(View):
         detector = get_plate_detector(source)
         if not detector or not detector.running:
             detector = start_plate_detector_by_source(source)
+
+        return StreamingHttpResponse(
+            _generate_mjpeg(detector),
+            content_type='multipart/x-mixed-replace; boundary=frame'
+        )
+
+
+class PlateStreamView(View):
+    """Stream MJPEG con detección de placas."""
+
+    def get(self, request, device_id):
+        detector = get_plate_detector(device_id)
+        if not detector or not detector.running:
+            try:
+                detector = start_plate_detector(device_id)
+            except ValueError as exc:
+                return JsonResponse({'error': str(exc)}, status=400)
 
         return StreamingHttpResponse(
             _generate_mjpeg(detector),
@@ -173,12 +195,19 @@ class PlateLookupView(View):
         try:
             veh = Vehiculo.objects.select_related('usuario').get(placa=placa)
             usuario = veh.usuario
+            espacio = _assign_space_for_user(usuario)
             return JsonResponse({
                 'found': True,
                 'placa': veh.placa,
                 'marca': veh.marca,
                 'modelo': veh.modelo,
                 'color': veh.color,
+                'espacio': {
+                    'id': espacio.id,
+                    'clave': espacio.clave,
+                    'area_id': espacio.area_id,
+                    'area_nombre': espacio.area.nombre if espacio and espacio.area else None,
+                } if espacio else None,
                 'usuario': {
                     'nombre': getattr(usuario, 'nombre', ''),
                     'apellidos': getattr(usuario, 'apellidos', ''),
@@ -214,15 +243,50 @@ class PlateLogAccessView(View):
         except Vehiculo.DoesNotExist:
             return JsonResponse({'error': 'Vehículo no encontrado', 'placa': placa}, status=404)
 
-        Acceso.objects.create(
-            fecha=timezone.now(),
-            tipo=tipo,
-            usuario=vehiculo.usuario,
-            vehiculo=vehiculo,
-        )
+        with transaction.atomic():
+            espacio = None
+            if vehiculo.usuario:
+                espacio = _assign_space_for_user(vehiculo.usuario)
+
+            Acceso.objects.create(
+                fecha=timezone.now(),
+                tipo=tipo,
+                usuario=vehiculo.usuario,
+                vehiculo=vehiculo,
+            )
+
+            notif_payload = None
+            if vehiculo.usuario:
+                notif = Notificacion.objects.create(
+                    usuario=vehiculo.usuario,
+                    tipo=Notificacion.Tipo.ACCESO_AUTORIZADO,
+                    cuerpo=f"Acceso autorizado: {placa}",
+                    descripcion=f"Vehículo {vehiculo.marca} {vehiculo.modelo} ({placa})" + (
+                        f" | Cajón: {espacio.clave}" if espacio else "")
+                )
+                notif_payload = {
+                    'id': notif.id,
+                    'usuario_id': notif.usuario_id,
+                    'tipo': notif.tipo,
+                    'cuerpo': notif.cuerpo,
+                    'descripcion': notif.descripcion,
+                    'leido': notif.leido,
+                    'fecha_creacion': notif.fecha_creacion.isoformat(),
+                }
+                transaction.on_commit(lambda payload=notif_payload, uid=vehiculo.usuario.id: broadcast(
+                    {'event': 'notificacion', 'data': payload},
+                    target_user_id=uid
+                ))
 
         return JsonResponse({
             'logged': True,
             'placa': placa,
-            'tipo': tipo
+            'tipo': tipo,
+            'espacio': {
+                'id': espacio.id,
+                'clave': espacio.clave,
+                'area_id': espacio.area_id,
+                'area_nombre': espacio.area.nombre if espacio and espacio.area else None,
+            } if espacio else None,
+            'notification': notif_payload,
         }, status=201)

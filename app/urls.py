@@ -12,6 +12,7 @@ from app.sanction.sanction_view import SanctionView
 from app.events.events_view import EventsView
 from app.access.access_view import AccessView
 from app.user.user_api_view import UserApiView, AreaListApiView, LoginApiView
+from app.notification.notification_api_view import NotificationApiView, NotificationStreamView
 from app.detection.detection_views import (
     DetectorStreamView, DetectorControlView, EspaciosStatusView
 )
@@ -33,6 +34,10 @@ urlpatterns = [
     path('api/users/', UserApiView.as_view(), name='api_users'),
     path('api/areas/', AreaListApiView.as_view(), name='api_areas'),
     path('api/login/', LoginApiView.as_view(), name='api_login'),
+    path('api/notifications/', NotificationApiView.as_view(),
+         name='api_notifications'),
+    path('api/notifications/stream/', NotificationStreamView.as_view(),
+         name='api_notifications_stream'),
     path('vehicle/', VehicleView.as_view(), name='vehicle'),
     path('sanction/', SanctionView.as_view(), name='sanction'),
     path('events/', EventsView.as_view(), name='events'),
