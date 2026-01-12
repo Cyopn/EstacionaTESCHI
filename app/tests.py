@@ -1,9 +1,7 @@
 from datetime import timedelta
-
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.utils import timezone
-
 from app.models import (
     Area,
     Espacio,
@@ -13,7 +11,6 @@ from app.models import (
     Notificacion,
 )
 from app.services import availability
-
 
 class AvailabilityUnitTests(TestCase):
     """Pruebas unitarias sobre heurística de disponibilidad y búsqueda de áreas."""
@@ -62,7 +59,6 @@ class AvailabilityUnitTests(TestCase):
         prediction = availability.predict_area_status(
             self.area_sur.id, target_dt=target)
 
-        # Con 3 de 4 libres, prob base 0.75; con decaimiento a 1h, ~0.65
         self.assertAlmostEqual(
             prediction["probabilidad_disponible"], 0.65, places=2)
         self.assertEqual(prediction["total"], 4)
