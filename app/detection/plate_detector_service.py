@@ -1,8 +1,3 @@
-"""
-Servicio de detección de placas vehiculares en tiempo real.
-Usa YOLOv10 para detectar vehículos y matrículas, y Tesseract OCR para leer el texto.
-Permite iniciar por ID de Dispositivo (modelo) o directamente por URL/IP de cámara.
-"""
 from app.models import Dispositivo
 import django
 import os
@@ -41,7 +36,6 @@ class PlateDetector:
         conf_vehicle: float = 0.35,
         conf_plate: float = 0.4,
     ) -> None:
-        # identifier puede ser el id del dispositivo o la propia URL/IP
         self.identifier = str(identifier)
         self.source = source
         self.vehicle_model_path = vehicle_model_path
@@ -231,7 +225,7 @@ class PlateDetector:
             'running': self.running,
             'last_plate': self.last_plate_text,
             'last_plate_at': self.last_plate_at,
-            'stream_url': None,  # la vista asigna la URL correcta
+            'stream_url': None,
         }
 
 
@@ -245,7 +239,6 @@ def get_plate_detector(identifier: str) -> Optional[PlateDetector]:
 
 
 def start_plate_detector(device_id: int) -> PlateDetector:
-    """Arranca detector usando un Dispositivo existente (por compatibilidad)."""
     with _plate_lock:
         identifier = str(device_id)
         if identifier in _plate_detectors:
@@ -263,7 +256,6 @@ def start_plate_detector(device_id: int) -> PlateDetector:
 
 
 def start_plate_detector_by_source(source: str) -> PlateDetector:
-    """Arranca detector usando directamente la URL/IP de la cámara."""
     with _plate_lock:
         identifier = source
         if identifier in _plate_detectors:

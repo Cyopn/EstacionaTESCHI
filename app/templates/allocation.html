@@ -210,14 +210,11 @@
         if (openBtn) openBtn.addEventListener('click', showModal)
         if (closeBtn) closeBtn.addEventListener('click', hideModal)
         if (cancelBtn) cancelBtn.addEventListener('click', hideModal)
-      
-        // close modal on backdrop click
         if (modal) {
           modal.addEventListener('click', function (e) {
             if (e.target === modal) hideModal()
           })
         }
-        // edit modal handlers
         const editModal = document.getElementById('edit-area-modal')
         const editClose = document.getElementById('edit-modal-close')
         const editCancel = document.getElementById('edit-modal-cancel')
@@ -266,22 +263,17 @@
       
         if (editDelete) {
           editDelete.addEventListener('click', function () {
-            // set action to delete and submit
             if (!editActionInput) return
             editActionInput.value = 'delete'
             editForm.submit()
           })
         }
-        // close edit modal on backdrop click
         if (editModal) {
           editModal.addEventListener('click', function (e) {
             if (e.target === editModal) hideEditModal()
           })
         }
       
-        // ============================================================
-        // DETECCIÓN DE ESPACIOS - Stream MJPEG y actualización de estado
-        // ============================================================
         const videoContainer = document.getElementById('area-video')
         const videoPlaceholder = document.getElementById('video-placeholder')
         const detectionStream = document.getElementById('detection-stream')
@@ -291,7 +283,6 @@
         let statusInterval = null
       
         function startDetection(areaId, areaName) {
-          // Si hay un detector anterior activo, pedir que se detenga
           if (currentAreaId && currentAreaId !== areaId) {
             try {
               fetch('/detection/control/' + currentAreaId + '/', {
@@ -304,21 +295,18 @@
       
           currentAreaId = areaId
       
-          // Mostrar stream de detección
           if (videoPlaceholder) videoPlaceholder.classList.add('hidden')
           if (detectionStream) {
             detectionStream.classList.remove('hidden')
-            // Forzar nueva solicitud al servidor añadiendo timestamp para evitar cache
             detectionStream.src = '/detection/stream/' + areaId + '/?t=' + Date.now()
             detectionStream.alt = 'Detección en ' + areaName
           }
       
-          // Iniciar polling de estado de espacios
           if (statusInterval) clearInterval(statusInterval)
           updateEspaciosStatus(areaId)
           statusInterval = setInterval(function () {
             updateEspaciosStatus(areaId)
-          }, 2000) // Actualizar cada 2 segundos
+          }, 2000)
       
           showToast('Detección iniciada para ' + areaName, 'success')
         }
@@ -351,7 +339,6 @@
               if (cajonesLibres) cajonesLibres.textContent = data.libres
               if (cajonesOcupados) cajonesOcupados.textContent = data.ocupados
       
-              // Actualizar tabla de áreas
               const row = document.querySelector('tr[data-area-id="' + areaId + '"]')
               if (row) {
                 const dispCell = row.querySelector('td:nth-child(2)')
@@ -365,7 +352,6 @@
             })
         }
       
-        // Click en filas de la tabla para iniciar detección
         const rows = document.querySelectorAll('tbody tr[data-area-id]')
         rows.forEach((tr) => {
           tr.setAttribute('role', 'button')
@@ -376,7 +362,6 @@
             const ruta = tr.dataset.dispositivoRuta || ''
             const name = tr.dataset.areaName || ''
       
-            // highlight selected
             rows.forEach((r) => r.classList.remove('bg-gray-100', 'ring-2', 'ring-blue-300'))
             tr.classList.add('bg-gray-100', 'ring-2', 'ring-blue-300')
       
@@ -392,7 +377,6 @@
               return
             }
       
-            // Iniciar detección para esta área
             startDetection(areaId, name)
           })
           tr.addEventListener('keydown', function (e) {
@@ -403,7 +387,6 @@
           })
         })
       })
-      // toasts and client-side validation (aligned with other templates)
       const toastContainer = document.getElementById('toast-container')
       
       function showToast(message, type = 'error') {
@@ -441,7 +424,6 @@
         }, 2200)
       }
       
-      // attach close handlers to server-rendered toasts
       if (toastContainer) {
         const toasts = toastContainer.querySelectorAll('.toast')
         toasts.forEach((t) => {
@@ -456,7 +438,6 @@
         })
       }
       
-      // Create form validation
       const createForm = document.getElementById('create-area-form')
       if (createForm) {
         createForm.addEventListener('submit', function (e) {
@@ -484,7 +465,6 @@
         })
       }
       
-      // Edit form validation and delete confirm
       const editFormEl = document.getElementById('edit-area-form')
       if (editFormEl) {
         editFormEl.addEventListener('submit', function (e) {

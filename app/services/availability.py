@@ -51,12 +51,10 @@ def predict_area_status(area_id: int, target_dt: Optional[datetime] = None) -> D
     total = info.get("total", 0) or 0
     libres = info.get("libres", 0) or 0
 
-    # Simple heuristic: usar la proporción actual como probabilidad base.
     prob = 0.0
     if total > 0:
         prob = libres / total
 
-    # Ajuste ligero por cercanía temporal: si es en menos de 1h, mantener prob; si más lejos, amortiguar.
     delta_hours = max(0.0, (target - timezone.now()).total_seconds() / 3600.0)
     decay = 1 / (1 + 0.25 * delta_hours)
     prob = max(0.05, min(0.95, prob * decay + 0.05))
@@ -86,14 +84,12 @@ def find_area_by_name_fragment(text: str) -> Optional[Area]:
         name_norm = normalize(area.nombre)
         name_compact = name_norm.replace(" ", "")
 
-        # Exact or contained either way
         if name_norm.strip() and (name_norm in text_norm or text_norm in name_norm):
             return area
         if name_compact and (name_compact in text_compact or text_compact in name_compact):
             best_area = best_area or area
             continue
 
-        # Prefix match: if text starts with key tokens from area name
         name_tokens = [t for t in name_norm.split() if t]
         if name_tokens:
             prefix = " ".join(name_tokens[:2]) if len(

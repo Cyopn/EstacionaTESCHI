@@ -38,7 +38,6 @@ def _send_sse(payload: str):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class NotificationApiView(View):
-    """Crea notificaciones y las emite por SSE."""
 
     def post(self, request):
         data = _parse_body(request)
@@ -87,7 +86,6 @@ class NotificationApiView(View):
 
 
 class NotificationStreamView(View):
-    """Endpoint SSE para consumir notificaciones en tiempo real."""
 
     def get(self, request):
         user_id = request.GET.get('usuario_id') or request.GET.get('user_id')
@@ -105,7 +103,6 @@ class NotificationStreamView(View):
                         msg = q.get(timeout=15)
                         yield _send_sse(msg)
                     except Exception:
-                        # keep-alive
                         yield b": keep-alive\n\n"
             finally:
                 unsubscribe(q)

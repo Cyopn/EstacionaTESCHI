@@ -6,8 +6,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 
 
 class MLChatModel:
-    """Simple TF-IDF retrieval model to keep conversational context."""
-
+    
     def __init__(self):
         self.examples = [
             ("hola", "Hola, soy tu asistente de estacionamiento. Puedo ver disponibilidad o predecir lugares."),
@@ -38,7 +37,6 @@ class MLChatModel:
         if not msg.strip():
             return "No entendí tu mensaje. Pregunta por disponibilidad o predicción de lugares."
 
-        # Combine message with brief history to bias similarity.
         history_hint = " ".join(history_lines[-4:]) if history_lines else ""
         query = f"{msg} {history_hint}".strip()
 

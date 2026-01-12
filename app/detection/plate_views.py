@@ -1,7 +1,3 @@
-"""
-Vistas para el servicio de detección de placas vehiculares.
-Entrega streaming MJPEG y permite controlar el detector.
-"""
 import json
 from app.notification.notification_broker import broadcast
 from django.http import JsonResponse, StreamingHttpResponse
@@ -22,7 +18,6 @@ from app.models import Vehiculo, Acceso, Espacio, Notificacion
 
 
 def _assign_space_for_user(usuario):
-    """Return first libre space, preferring user's area, without altering estado."""
     if not usuario:
         return None
 
@@ -50,7 +45,6 @@ def _generate_mjpeg(detector):
 
 
 class PlateStreamByIpView(View):
-    """Stream MJPEG usando IP/URL de cámara proporcionada por querystring ?ip=..."""
 
     def get(self, request):
         source = request.GET.get('ip')
@@ -68,7 +62,6 @@ class PlateStreamByIpView(View):
 
 
 class PlateStreamView(View):
-    """Stream MJPEG con detección de placas."""
 
     def get(self, request, device_id):
         detector = get_plate_detector(device_id)
@@ -86,7 +79,6 @@ class PlateStreamView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PlateControlView(View):
-    """Inicia o detiene el detector de placas."""
 
     def post(self, request, device_id):
         body = json.loads(request.body) if request.body else {}
@@ -103,7 +95,7 @@ class PlateControlView(View):
                 return JsonResponse({'device_id': device_id, 'running': False})
         except ValueError as exc:
             return JsonResponse({'error': str(exc)}, status=400)
-        except Exception as exc:  # pragma: no cover
+        except Exception as exc: 
             return JsonResponse({'error': str(exc)}, status=500)
 
         return JsonResponse({'error': 'Acción inválida'}, status=400)
@@ -119,7 +111,6 @@ class PlateControlView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PlateControlByIpView(View):
-    """Inicia o detiene el detector de placas por IP/URL."""
 
     def post(self, request):
         source = request.GET.get('ip')
@@ -138,7 +129,7 @@ class PlateControlByIpView(View):
             if action == 'stop':
                 stop_plate_detector(source)
                 return JsonResponse({'identifier': source, 'running': False})
-        except Exception as exc:  # pragma: no cover
+        except Exception as exc:
             return JsonResponse({'error': str(exc)}, status=500)
 
         return JsonResponse({'error': 'Acción inválida'}, status=400)
@@ -157,7 +148,6 @@ class PlateControlByIpView(View):
 
 
 class PlateStatusView(View):
-    """Devuelve último texto detectado y estado de ejecución."""
 
     def get(self, request, device_id):
         detector = get_plate_detector(device_id)
@@ -169,7 +159,6 @@ class PlateStatusView(View):
 
 
 class PlateStatusByIpView(View):
-    """Devuelve estado del detector asociado a una IP/URL."""
 
     def get(self, request):
         source = request.GET.get('ip')
@@ -185,7 +174,6 @@ class PlateStatusByIpView(View):
 
 
 class PlateLookupView(View):
-    """Busca un vehículo por placa exacta (mayúsculas) y retorna datos básicos."""
 
     def get(self, request):
         placa = request.GET.get('placa', '').strip().upper()
@@ -220,7 +208,6 @@ class PlateLookupView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class PlateLogAccessView(View):
-    """Registra un acceso autorizado en el modelo Acceso."""
 
     def post(self, request):
         try:

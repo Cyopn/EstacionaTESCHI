@@ -1,17 +1,4 @@
-"""
-Escenarios de carga/estrés sobre endpoints publicos.
 
-Ejecutar con:
-    locust -f app/tests_stress.py --host http://localhost:8000
-
-Endpoints cubiertos:
-- /api/availability/
-- /plates/lookup/
-- /plates/log_access/
-
-Nota: para evitar errores 404 en log_access, definir STRESS_PLATE con una placa existente
-(en la BD) o ajustar el arreglo PLATES.
-"""
 import os
 import random
 from locust import HttpUser, task, between, tag

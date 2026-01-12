@@ -1,9 +1,3 @@
-"""
-Servicio de detección de espacios de estacionamiento.
-Procesa stream de video, detecta cajones pintados y vehículos con YOLOv8,
-dibuja bboxes rotulados, y actualiza el estado de los espacios en la base de datos.
-Sirve el video procesado via MJPEG.
-"""
 from app.models import Area, Espacio, Dispositivo
 import django
 import os
@@ -29,14 +23,6 @@ except ImportError:
 
 
 class ParkingDetector:
-    """
-    Detector de espacios de estacionamiento.
-    - Detecta cajones pintados en el piso usando procesamiento de imagen
-    - Detecta vehículos en el frame con YOLO
-    - Asigna cada vehículo a un cajón basado en IoU
-    - Actualiza estado en BD
-    - Genera frame con bboxes rotulados para streaming
-    """
 
     VEHICLE_CLASSES = {2: 'auto', 3: 'moto', 5: 'bus', 7: 'camion'}
 
@@ -72,7 +58,6 @@ class ParkingDetector:
         self.stationary_threshold_frames = 15
 
     def _load_model(self):
-        """Carga el modelo YOLO"""
         if YOLO is None:
             raise RuntimeError("ultralytics no está instalado")
 
@@ -98,10 +83,6 @@ class ParkingDetector:
         print(f"Modelo cargado: {self.model_path}")
 
     def _detect_parking_lines(self, frame):
-        """
-        Detecta las líneas de los cajones de estacionamiento usando procesamiento de imagen.
-        Busca líneas blancas/amarillas que delimitan los espacios.
-        """
         h, w = frame.shape[:2]
 
         hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -133,9 +114,7 @@ class ParkingDetector:
         return lines, combined_mask
 
     def _find_parking_spots_from_lines(self, lines, frame_shape):
-        """
-        Agrupa las líneas detectadas para formar rectángulos de cajones.
-        """
+
         if lines is None:
             return []
 
@@ -208,7 +187,6 @@ class ParkingDetector:
         return spots
 
     def _cluster_lines(self, lines, threshold, axis):
-        """Agrupa líneas cercanas"""
         if not lines:
             return []
 
@@ -230,9 +208,7 @@ class ParkingDetector:
         return groups
 
     def _find_spots_by_contours(self, lines, frame_shape):
-        """
-        Método alternativo: buscar rectángulos directamente en la imagen.
-        """
+
         h, w = frame_shape[:2]
         spots = []
 
@@ -272,10 +248,7 @@ class ParkingDetector:
         return spots
 
     def _create_adaptive_grid(self, frame_shape):
-        """
-        Crea una grilla adaptativa cuando no se detectan líneas claras.
-        Usa proporción típica de cajones de estacionamiento.
-        """
+
         h, w = frame_shape[:2]
         spots = []
 
@@ -305,10 +278,7 @@ class ParkingDetector:
         return spots
 
     def _calibrate_spots(self, frame):
-        """
-        Fase de calibración: acumula detecciones de cajones durante varios frames
-        para obtener una detección más estable.
-        """
+
         lines, mask = self._detect_parking_lines(frame)
         spots = self._find_parking_spots_from_lines(lines, frame.shape)
 
@@ -324,9 +294,7 @@ class ParkingDetector:
                 f"Calibración completa: {len(self.parking_spots)} cajones detectados")
 
     def _consolidate_spots(self):
-        """
-        Consolida las detecciones de cajones de múltiples frames.
-        """
+
         if not self.candidate_spots:
             self.parking_spots = []
             return
@@ -352,9 +320,7 @@ class ParkingDetector:
                     self._last_frame_shape)
 
     def _postprocess_spots(self, spots, frame_shape, iou_merge=0.5):
-        """
-        Filtra cajones demasiado pequeños/grandes y fusiona solapados.
-        """
+
         h, w = frame_shape[:2]
         filtered = []
         for spot in spots:
@@ -388,7 +354,6 @@ class ParkingDetector:
         return merged
 
     def _match_track(self, center, max_dist=40):
-        """Busca un track existente cercano al centro y lo actualiza; si no, crea uno nuevo."""
         for tid, t in list(self.tracks.items()):
             tx, ty = t['center']
             dist = (tx - center[0])**2 + (ty - center[1])**2
@@ -407,9 +372,7 @@ class ParkingDetector:
         return tid, self.tracks[tid]
 
     def _create_spot_from_vehicle(self, vehicle_bbox):
-        """Genera un spot (polygon + bbox) a partir de un bbox de vehículo estacionario.
-        Añade el spot a self.parking_spots si no existe uno similar.
-        """
+
         x1, y1, x2, y2 = vehicle_bbox
         pad_x = int((x2 - x1) * 0.3) + 10
         pad_y = int((y2 - y1) * 0.2) + 5
@@ -455,9 +418,6 @@ class ParkingDetector:
         return new_spot
 
     def _init_espacios_from_spots(self):
-        """
-        Crea los espacios en la BD basado en los cajones detectados.
-        """
         try:
             area = Area.objects.get(pk=self.area_id)
         except Area.DoesNotExist:
@@ -504,7 +464,6 @@ class ParkingDetector:
             f"Espacios sincronizados: {len(self.espacios_map)} para área {self.area_id}")
 
     def _calculate_iou(self, box1, box2):
-        """Calcula Intersection over Union entre dos bboxes"""
         x1 = max(box1[0], box2[0])
         y1 = max(box1[1], box2[1])
         x2 = min(box1[2], box2[2])
@@ -520,7 +479,6 @@ class ParkingDetector:
         return intersection / union if union > 0 else 0
 
     def _point_in_polygon(self, point, polygon):
-        """Verifica si un punto está dentro de un polígono"""
         x, y = point
         n = len(polygon)
         inside = False
@@ -537,7 +495,6 @@ class ParkingDetector:
         return inside
 
     def _update_espacio_estado(self, espacio_id: int, ocupado: bool):
-        """Actualiza el estado de un espacio en la BD"""
         try:
             espacio = Espacio.objects.get(pk=espacio_id)
             nuevo_estado = Espacio.Estado.OCUPADO if ocupado else Espacio.Estado.LIBRE
@@ -550,7 +507,6 @@ class ParkingDetector:
             pass
 
     def _draw_spots(self, frame, occupied_spots: set):
-        """Dibuja los cajones detectados con colores según ocupación"""
         for idx, spot in enumerate(self.parking_spots):
             is_occupied = idx in occupied_spots
             color = self.COLOR_OCCUPIED if is_occupied else self.COLOR_FREE
@@ -591,7 +547,6 @@ class ParkingDetector:
         return frame
 
     def _process_frame(self, frame):
-        """Procesa un frame: detecta cajones, detecta vehículos, actualiza BD, dibuja anotaciones"""
         if frame is None:
             return None
 
@@ -710,7 +665,6 @@ class ParkingDetector:
         return frame
 
     def _capture_loop(self):
-        """Loop principal de captura y procesamiento"""
         print(f"Iniciando captura de {self.source} para área {self.area_id}")
 
         self.cap = cv2.VideoCapture(self.source)
@@ -748,7 +702,6 @@ class ParkingDetector:
         print(f"Captura detenida para área {self.area_id}")
 
     def start(self):
-        """Inicia el detector en un thread separado"""
         if self.running:
             return
 
@@ -766,14 +719,12 @@ class ParkingDetector:
         print(f"Detector iniciado para área {self.area_id}")
 
     def stop(self):
-        """Detiene el detector"""
         self.running = False
         if self.thread:
             self.thread.join(timeout=5)
         print(f"Detector detenido para área {self.area_id}")
 
     def get_frame_jpeg(self) -> bytes:
-        """Obtiene el frame actual como JPEG para streaming"""
         with self.frame_lock:
             if self.frame is None:
                 placeholder = np.zeros((480, 640, 3), dtype=np.uint8)
@@ -792,13 +743,11 @@ _detectors_lock = threading.Lock()
 
 
 def get_detector(area_id: int) -> ParkingDetector:
-    """Obtiene el detector activo para un área"""
     with _detectors_lock:
         return _active_detectors.get(area_id)
 
 
 def start_detector(area_id: int) -> ParkingDetector:
-    """Inicia un detector para un área"""
     with _detectors_lock:
         if area_id in _active_detectors:
             _active_detectors[area_id].stop()
@@ -820,7 +769,6 @@ def start_detector(area_id: int) -> ParkingDetector:
 
 
 def stop_detector(area_id: int):
-    """Detiene el detector de un área"""
     with _detectors_lock:
         if area_id in _active_detectors:
             _active_detectors[area_id].stop()
@@ -828,7 +776,6 @@ def stop_detector(area_id: int):
 
 
 def stop_all_detectors():
-    """Detiene todos los detectores"""
     with _detectors_lock:
         for detector in _active_detectors.values():
             detector.stop()

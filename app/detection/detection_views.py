@@ -1,7 +1,4 @@
-"""
-Vistas para el servicio de detección de espacios de estacionamiento.
-Proporciona endpoints para streaming MJPEG y control del detector.
-"""
+
 from django.http import StreamingHttpResponse, JsonResponse
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
@@ -15,7 +12,6 @@ from app.detection.detector_service import (
 
 
 def generate_mjpeg(detector):
-    """Generador para streaming MJPEG"""
     while detector.running:
         frame = detector.get_frame_jpeg()
         yield (
@@ -25,11 +21,6 @@ def generate_mjpeg(detector):
 
 
 class DetectorStreamView(View):
-    """
-    Endpoint para obtener el stream MJPEG con las detecciones.
-    GET /detection/stream/<area_id>/
-    """
-
     def get(self, request, area_id):
         detector = get_detector(area_id)
 
@@ -47,12 +38,6 @@ class DetectorStreamView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class DetectorControlView(View):
-    """
-    Endpoint para controlar el detector.
-    POST /detection/control/<area_id>/
-    Body: {"action": "start" | "stop"}
-    """
-
     def post(self, request, area_id):
         try:
             data = json.loads(request.body) if request.body else {}
@@ -79,8 +64,7 @@ class DetectorControlView(View):
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)
 
-    def get(self, request, area_id):
-        """Obtener estado del detector"""
+    def get(self, request, area_id): 
         detector = get_detector(area_id)
         running = detector is not None and detector.running
 
@@ -92,10 +76,6 @@ class DetectorControlView(View):
 
 
 class EspaciosStatusView(View):
-    """
-    Endpoint para obtener el estado de los espacios de un área.
-    GET /detection/espacios/<area_id>/
-    """
 
     def get(self, request, area_id):
         try:

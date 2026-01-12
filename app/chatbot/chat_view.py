@@ -127,7 +127,6 @@ class ChatbotView(APIView):
                 .values("nombre", "fecha_inicio", "fecha_fin", "area__nombre", "prioridad")[:5]
             )
             if not eventos:
-                # Si no hay futuros, traer los últimos 5 registrados (cualquier fecha)
                 eventos = list(
                     qs.order_by("-fecha_inicio")
                     .values("nombre", "fecha_inicio", "fecha_fin", "area__nombre", "prioridad")[:5]
@@ -176,7 +175,6 @@ class ChatbotView(APIView):
             )
             return {"texto": texto, "disponibilidad": top}
 
-        # Fallback: primero intento LLM con contexto; si falla, uso ML simple
         history_lines = self._history_lines(conversation)
         try:
             texto = self._llm_wrap(

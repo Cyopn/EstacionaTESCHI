@@ -31,7 +31,6 @@ def _serialize_user(user: Usuario):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class UserApiView(View):
-    """Crea o actualiza usuarios vía JSON."""
 
     def post(self, request):
         data = _parse_body(request)
@@ -106,7 +105,6 @@ class UserApiView(View):
 
 
 class AreaListApiView(View):
-    """Listado de áreas en JSON."""
 
     def get(self, request):
         areas = Area.objects.all().order_by('nombre')
@@ -116,7 +114,6 @@ class AreaListApiView(View):
 
 @method_decorator(csrf_exempt, name='dispatch')
 class LoginApiView(View):
-    """Autentica usuario por correo y contraseña."""
 
     def post(self, request):
         data = _parse_body(request)

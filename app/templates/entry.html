@@ -131,7 +131,6 @@
       function validSource(v) {
         if (!v) return false
         const val = String(v).trim()
-        // acepta URL http/https o IPv4 simple con opcional puerto y ruta
         const urlRegex = /^https?:\/\//i
         if (urlRegex.test(val)) return true
         const ipv4 = val.match(/^(\d{1,3})(?:\.(\d{1,3})){3}(?::\d+)?(?:\/.*)?$/)
@@ -179,7 +178,6 @@
         if (overlay) overlay.classList.add('hidden')
         if (refresh) {
           img.src = ''
-          // slight delay to ensure reload
           setTimeout(() => {
             img.src = url
           }, 50)
