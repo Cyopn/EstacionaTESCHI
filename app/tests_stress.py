@@ -17,11 +17,11 @@ import random
 from locust import HttpUser, task, between, tag
 
 PLATES = [
-    "ABC123",
-    "TESCHI01",
-    "ZZZ000",
+    "PEL5217",
+    "LZF118C",
+    "MWG631C",
 ]
-DEFAULT_PLATE = os.environ.get("STRESS_PLATE", "ABC123")
+DEFAULT_PLATE = os.environ.get("STRESS_PLATE", "PEL5217")
 
 
 class AvailabilityUser(HttpUser):
