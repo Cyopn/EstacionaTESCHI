@@ -56,6 +56,8 @@ class PlateDetector:
         self.last_plate_at: Optional[float] = None
 
         tesseract_cmd = os.getenv('TESSERACT_CMD')
+        if not tesseract_cmd:
+            tesseract_cmd = r"C:\Program Files\Tesseract-OCR\tesseract.exe"
         if tesseract_cmd:
             pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
 

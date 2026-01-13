@@ -113,7 +113,7 @@ class ChatbotView(APIView):
             return {"texto": texto, "areas": nombres}
 
         if self._is_greeting(lower):
-            texto = "Hola, soy tu asistente virtual de EstacionTESCHI. Puedo ayudarte a consultar disponibilidad, predicciones y eventos."
+            texto = "Hola, soy tu asistente virtual de EstacionaTESCHI. Puedo ayudarte a consultar disponibilidad, predicciones y eventos."
             return {"texto": texto}
 
         if self._is_events_intent(lower):
