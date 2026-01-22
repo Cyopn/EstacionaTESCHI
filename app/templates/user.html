@@ -115,6 +115,7 @@
         <form id="employee-form" method="post" action="{% url 'user' %}">
           {% csrf_token %}
           <input type="hidden" name="matricula" id="modal-matricula" />
+          <input type="hidden" name="delete" id="modal-delete-input" value="" />
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-sm font-medium">Nombre</label>
@@ -147,6 +148,7 @@
             </div>
           </div>
           <div class="mt-6 flex justify-end gap-3">
+            <button type="button" id="modal-delete" class="px-6 py-2 bg-red-500/30 border border-red-500 rounded-full cursor-pointer">Eliminar</button>
             <button type="button" id="modal-cancel" class="px-6 py-2 bg-white border rounded-full cursor-pointer">Cancelar</button>
             <button type="submit" class="px-6 py-2 bg-black text-white rounded-full cursor-pointer">Modificar</button>
           </div>
@@ -193,6 +195,19 @@
           modal.addEventListener('click', function (e) {
             if (e.target === modal) closeModal()
           })
+        // Manejar eliminación desde el modal: confirmar y enviar formulario con campo "delete"
+        const modalDeleteBtn = document.getElementById('modal-delete')
+        const modalDeleteInput = document.getElementById('modal-delete-input')
+        const employeeForm = document.getElementById('employee-form')
+        if (modalDeleteBtn && modalDeleteInput && employeeForm) {
+          modalDeleteBtn.addEventListener('click', function (e) {
+            e.preventDefault()
+            const nombre = document.getElementById('modal-nombre').value || ''
+            if (!confirm(`¿Eliminar al usuario "${nombre}"? Esta acción no se puede deshacer.`)) return
+            modalDeleteInput.value = '1'
+            employeeForm.submit()
+          })
+        }
         const searchInput = document.getElementById('search-input')
         const searchBtn = document.getElementById('search-btn')
         const tbody = document.querySelector('table tbody')

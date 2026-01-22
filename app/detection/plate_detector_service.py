@@ -9,6 +9,7 @@ from typing import Optional
 import cv2
 import numpy as np
 import pytesseract
+import torch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(
     os.path.dirname(os.path.abspath(__file__)))))
@@ -75,6 +76,13 @@ class PlateDetector:
             vehicle_path) else self.vehicle_model_path)
         self.plate_model = YOLO(plate_path if os.path.exists(
             plate_path) else self.plate_model_path)
+
+        if torch.cuda.is_available():
+            self.vehicle_model = self.vehicle_model.to('cuda')
+            self.plate_model = self.plate_model.to('cuda')
+            print("Detector de placas en GPU: cuda")
+        else:
+            print("Detector de placas en CPU: gpu no disponible")
 
         print(
             f"Modelos cargados: vehiculos={self.vehicle_model_path}, placas={self.plate_model_path}")

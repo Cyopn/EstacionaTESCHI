@@ -17,6 +17,10 @@ class UserView(View):
             return redirect(request.path)
 
         usuario = get_object_or_404(Usuario, matricula=matricula)
+        if request.POST.get('delete'):
+            usuario.delete()
+            messages.success(request, 'Usuario eliminado correctamente.')
+            return redirect(request.path)
         usuario.nombre = request.POST.get('nombre', usuario.nombre)
         usuario.apellidos = request.POST.get('apellidos', usuario.apellidos)
         usuario.correo = request.POST.get('correo', usuario.correo)

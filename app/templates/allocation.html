@@ -84,7 +84,6 @@
       </div>
     </div>
 
-    <!-- Edit / Delete Area Modal (mismo diseño que Create Area) -->
     <div id="edit-area-modal" class="fixed inset-0 hidden items-center justify-center bg-black/50 z-50">
       <div class="bg-white rounded-lg w-2/3 p-8 relative">
         <button id="edit-modal-close" class="absolute top-3 end-3 text-gray-600 text-2xl cursor-pointer">&times;</button>
@@ -168,12 +167,12 @@
             </div>
           </div>
           <div class="w-2/3 bg-blue-500 h-[80%] m-4 bg-white flex flex-col justify-center items-center gap-5">
-            <div id="area-video" class="w-full max-h-8/10 h-8/10 border-2 border-gray-400 rounded-lg shadow-lg flex items-center justify-center text-gray-500 overflow-hidden bg-black">
+            <div id="area-video" class="w-full h-[80%] max-h-[80%] border-2 border-gray-400 rounded-lg shadow-lg flex items-center justify-center text-gray-500 overflow-hidden bg-black">
               <div id="video-placeholder" class="text-center">
                 <p class="text-lg">Selecciona un área para iniciar la detección.</p>
                 <p class="text-sm text-gray-400 mt-2">El sistema detectará automáticamente los espacios de estacionamiento.</p>
               </div>
-              <img id="detection-stream" class="hidden w-full h-full object-contain" alt="Stream de detección" />
+              <img id="detection-stream" class="hidden w-full h-full max-h-full object-contain" alt="Stream de detección" />
             </div>
             <div class="w-full h-2/10 flex justify-center gap-4">
               <div class="w-[45%] border-2 border-gray-400/80 rounded-lg shadow-lg">

@@ -17,7 +17,6 @@ class AvailabilityUser(HttpUser):
     @task
     @tag("availability")
     def list_availability(self):
-        # GET masivo al listado de disponibilidad
         self.client.get("/api/availability/", name="/api/availability/")
 
 
@@ -27,7 +26,6 @@ class PlateLookupUser(HttpUser):
     @task
     @tag("lookup")
     def lookup_plate(self):
-        # GET de lookup de placa con pool fijo
         plate = random.choice(PLATES)
         self.client.get(
             "/plates/lookup/",
@@ -40,13 +38,11 @@ class PlateLogAccessUser(HttpUser):
     wait_time = between(1, 3)
 
     def on_start(self):
-        # Usa una placa fija para evitar 404 si no existe en BD
         self.plate = DEFAULT_PLATE
 
     @task
     @tag("log_access")
     def log_access(self):
-        # POST que registra acceso y genera notificacion
         payload = {"placa": self.plate, "tipo": "ENTRADA"}
         self.client.post(
             "/plates/log_access/",

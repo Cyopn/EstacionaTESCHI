@@ -6,6 +6,7 @@ import threading
 import time
 import cv2
 import numpy as np
+import torch
 from collections import defaultdict
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(
@@ -79,6 +80,12 @@ class ParkingDetector:
         else:
             raise FileNotFoundError(
                 f"No se encontró el modelo YOLO en ninguna de las rutas: {candidates}")
+            
+        if torch.cuda.is_available():
+            self.model = self.model.to('cuda')
+            print("Detector estacionamiento en GPU: cuda")
+        else:
+            print("Detector estacionamiento en CPU: gpu no disponible")
 
         print(f"Modelo cargado: {self.model_path}")
 
